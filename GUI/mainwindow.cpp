@@ -100,76 +100,13 @@ void MainWindow::OnOpenProject()
 void MainWindow::OnCloseProject()
 {
     projectExplorer->CloseActiveProject();
+    delete this->project;
+    this->project = NULL;
 }
 void MainWindow::Exit()
 {
     this->close();
 }
-/*
-void MainWindow::SetMediator(Mediator* mediator)
-{
-    this->mediator = mediator;
-}*/
-/*
-void MainWindow::SetProject(const Project& proj)
-{
-    try
-    {
-        projectExplorer->SetProject(proj);
-    }
-    catch (Exception& e)
-    {
-        QMessageBox::warning(this, "Cannot create project", e.what());
-    }
-}
-void MainWindow::on_actionRefresh_Project_Explorer_triggered()
-{
-    projectExplorer->Refresh();
-}
-void MainWindow::on_actionQuit_triggered()
-{
-    this->close();
-}
-void MainWindow::on_actionNew_Project_triggered()
-{
-    NewProjectDialog newProjDiag(this);
-    newProjDiag.setModal(true);
-    newProjDiag.exec();
-}
-
-void MainWindow::CloseTab(int index)
-{
-    tabEditor->CloseTab(index);
-}
-void MainWindow::NewTab(QModelIndex index)
-{
-    QFileInfo info = projectExplorer->GetModel()->fileInfo(index);
-
-    tabEditor->AddTab(info);
-}
-
-void MainWindow::on_actionBuild_triggered()
-{
-    const Project& project = projectExplorer->GetProject();
-
-    QString makefile = makeFileBuilder->BuildMakefile(project);
-    QFile file(project.DirPath() + project.Name() + "/" + project.Name() + ".makefile");
-    file.open(QFile::WriteOnly);
-    file.write(makefile.toStdString().c_str(), makefile.size());
-    file.close();
-
-    QProcess* process = new QProcess(this);
-    process->setProcessChannelMode(QProcess::MergedChannels);
-    process->setWorkingDirectory(project.DirPath() + project.Name());
-
-    process->start(project.MakePath() + " -f " + project.Name() + ".makefile " + project.Name());
-
-    if (!process->waitForFinished())
-        qDebug() << "Make failed: " << process->errorString();
-    else
-        qDebug() << "Make output: " << process->readAll();
-}*/
-
 void MainWindow::on_actionNew_Project_triggered()
 {
     this->OnNewProject();

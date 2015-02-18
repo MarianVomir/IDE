@@ -12,9 +12,23 @@ SimpleMakefileBuilder::~SimpleMakefileBuilder()
 
 QString SimpleMakefileBuilder::BuildMakefile(const Project& project)
 {
+    stringstream ss;
+    ss << "compiler=" << project.Compiler().toStdString() << "\n";
+    ss << "cFlags=" << project.CompilerFlags().toStdString() << "\n";
+    ss << "lFlags=" << project.LinkerFlags().toStdString() << "\n";
+
+    ss << "all: " << project.Name().toStdString() << "\n";
+    ss << project.Name().toStdString() << " : ";
+
+    QString projectRoot = project.Root();
+    QString projectSrcDir = projectRoot + "src/";
+
+    QStringList validSourceFileList;
+    QStringList objectFileList;
+    QString objectFile = "";
+
     QStringList sourceFiles;
     QStringList sourceDirs;
-    QString projectRoot = project.Root();// + "/";
     QDir dir(projectRoot + "src");
     if (dir.exists())
     {
@@ -23,6 +37,10 @@ QString SimpleMakefileBuilder::BuildMakefile(const Project& project)
         {
             dirIt.next();
             QString path = dirIt.filePath();
+
+            if (path.endsWith(".") || path.endsWith(".."))
+                continue;
+
             QFileInfo info(path);
 
             if (!info.isDir())
@@ -36,40 +54,9 @@ QString SimpleMakefileBuilder::BuildMakefile(const Project& project)
         }
     }
 
-    foreach (QString dir, sourceDirs)
-    {
-        if (dir.indexOf(projectRoot + "src") == 0) // dir is in project's src folder
-        {
-            dir.replace(0, QString(projectRoot + "src").size(), QString(projectRoot + "bin"));
-
-            if (dir.size() >= 2)
-            {
-                if (dir[dir.size() - 1] != '.')
-                {
-                    QDir d(dir);
-                    d.mkpath(".");
-                }
-            }
-        }
-
-    }
-
-    stringstream ss;
-    ss << "compiler=" << project.Compiler().toStdString() << "\n";
-    ss << "cFlags=" << project.CompilerFlags().toStdString() << "\n";
-    ss << "lFlags=" << project.LinkerFlags().toStdString() << "\n";
-
-    ss << "all: " << project.Name().toStdString() << "\n";
-    ss << project.Name().toStdString() << " : ";
-
-    QString projectSrcDir = projectRoot + "src/";
-
-    QStringList validSourceFileList;
-    QStringList objectFileList;
-    QString objectFile = "";
     for (QString fileName : sourceFiles)
     {
-        if (fileName.size() >= 2)
+        if (fileName.size() > 2)
         {
             if (fileName[fileName.size() - 1] == 'c' && fileName[fileName.size() - 2] == '.') // found a .c source file
             {
