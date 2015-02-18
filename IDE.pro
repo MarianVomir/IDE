@@ -33,7 +33,9 @@ SOURCES += main.cpp\
     Editing/Utility/LineNumberArea.cpp \
     Editing/CEditorPage.cpp \
     Editing/Utility/CLexic.cpp \
-    Editing/Utility/CSyntaxHighlighter.cpp
+    Editing/Utility/CSyntaxHighlighter.cpp \
+    ProjectTesting/SimpleMakefileBuilder.cpp \
+    ProjectTesting/MakefileBasedProjectBuilder.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -58,7 +60,11 @@ HEADERS  += \
     Editing/Utility/LineNumberArea.h \
     Editing/CEditorPage.h \
     Editing/Utility/CLexic.h \
-    Editing/Utility/CSyntaxHighlighter.h
+    Editing/Utility/CSyntaxHighlighter.h \
+    ProjectTesting/MakefileBuilder.h \
+    ProjectTesting/SimpleMakefileBuilder.h \
+    ProjectTesting/MakefileBasedProjectBuilder.h \
+    ProjectTesting/ProjectBuilder.h
 
 FORMS    += \
     GUI/mainwindow.ui \

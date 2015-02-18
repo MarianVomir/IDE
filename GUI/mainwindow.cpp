@@ -6,16 +6,19 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    this->project = NULL;
+
     ui->setupUi(this);
     converter = new JSONConverter();
     projectExplorer = new ProjectExplorer();
     projectExplorer->SetTree(ui->projectTree);
     projectExplorer->SetProjectFileConverter(converter);
 
-    /*makeFileBuilder = new MakefileBuilder();
-    tabEditor = new TabEditor(this);
-    tabEditor->TabWidget(ui->tabEditor);
-*/
+    makefileBuilder = new SimpleMakefileBuilder();
+    projectBuilder = new MakefileBasedProjectBuilder(makefileBuilder);
+
+    editor = new Editor(ui->tabEditor);
+
     QList<int> sizes;
     sizes.append(200);
     sizes.append(900);
@@ -29,15 +32,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->setFloatable(false);
     ui->mainToolBar->setMovable(false);
 
-    editor = new Editor(ui->tabEditor);
-/*
-
-    connect(tabEditor->TabWidget(), SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
-*/
     connect(projectExplorer->GetTree(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnProjectExplorerDoubleClicked(QModelIndex)));
 }
 MainWindow::~MainWindow()
 {
+    delete projectExplorer;
+    delete converter;
+    delete projectBuilder;
+    delete makefileBuilder;
+    delete editor;
+
     delete ui;
 }
 
@@ -213,4 +217,22 @@ void MainWindow::on_actionSave_File_As_triggered()
 void MainWindow::on_actionNew_File_triggered()
 {
     this->editor->NewFile();
+}
+
+void MainWindow::on_actionBuild_triggered()
+{
+    if (this->project != NULL)
+        this->projectBuilder->Build(*this->project);
+}
+
+void MainWindow::on_actionClean_triggered()
+{
+    if (this->project != NULL)
+        this->projectBuilder->Clean(*this->project);
+}
+
+void MainWindow::on_actionRebuild_triggered()
+{
+    if (this->project != NULL)
+        this->projectBuilder->Rebuild(*this->project);
 }

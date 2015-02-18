@@ -22,6 +22,11 @@
 
 #include "Editing/Editor.h"
 
+#include "ProjectTesting/ProjectBuilder.h"
+#include "ProjectTesting/MakefileBasedProjectBuilder.h"
+#include "ProjectTesting/MakefileBuilder.h"
+#include "ProjectTesting/SimpleMakefileBuilder.h"
+
 #include "newprojectdialog.h"
 #include "openprojectdialog.h"
 
@@ -62,6 +67,12 @@ private slots:
 
     void on_actionNew_File_triggered();
 
+    void on_actionBuild_triggered();
+
+    void on_actionClean_triggered();
+
+    void on_actionRebuild_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -69,6 +80,8 @@ private:
     ProjectExplorer* projectExplorer;
     ProjectFileConverter* converter;
     Editor* editor;
+    ProjectBuilder* projectBuilder;
+    MakefileBuilder* makefileBuilder;
 
 public:
     void OnNewProject();

@@ -161,9 +161,15 @@
     <property name="title">
      <string>Project</string>
     </property>
+    <addaction name="actionRun"/>
+    <addaction name="actionBuild"/>
+    <addaction name="actionClean"/>
+    <addaction name="actionRebuild"/>
+    <addaction name="separator"/>
     <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="actionClose_Project"/>
+    <addaction name="separator"/>
     <addaction name="actionRefreshProjectExplorer"/>
    </widget>
    <addaction name="menuFile"/>
@@ -235,6 +241,26 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="text">
+    <string>Run</string>
+   </property>
+  </action>
+  <action name="actionBuild">
+   <property name="text">
+    <string>Build</string>
+   </property>
+  </action>
+  <action name="actionClean">
+   <property name="text">
+    <string>Clean</string>
+   </property>
+  </action>
+  <action name="actionRebuild">
+   <property name="text">
+    <string>Rebuild</string>
    </property>
   </action>
  </widget>
