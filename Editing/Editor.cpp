@@ -5,12 +5,52 @@ Editor::Editor(QTabWidget *tabWidget)
 {
     while (tabWidget->count()) delete tabWidget->widget(0);
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
+
+    watcher = new QFileSystemWatcher(this);
+
+    connect(watcher, SIGNAL(fileChanged(QString)), this, SLOT(OnFileChanged(QString)));
+}
+int Editor::GetTabContainingFile(const QString &filePath)
+{
+    for (int i = 0; i < tabWidget->count(); i++)
+    {
+        if (tabWidget->widget(i)->property("filePath").toString() == filePath)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+void Editor::OnFileChanged(QString filePath)
+{
+    QMessageBox box;
+    box.setText("File " + filePath + " has been moved or deleted, keep in editor?");
+    box.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+    box.setDefaultButton(QMessageBox::Yes);
+
+    int answer = box.exec();
+
+    int tabIndex = GetTabContainingFile(filePath);
+    if (tabIndex != -1)
+    {
+        if (answer == QMessageBox::Yes)
+        {
+            MarkSaveStatus(tabIndex, false);
+        }
+        else if (answer == QMessageBox::No)
+        {
+            CloseTab(tabIndex);
+        }
+    }
 }
 
 Editor::~Editor()
 {
     while (tabWidget->count()) delete tabWidget->widget(0);
     disconnect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
+
+    delete watcher;
 }
 
 void Editor::CurrentDocChanged()
@@ -19,11 +59,24 @@ void Editor::CurrentDocChanged()
     int index = tabWidget->currentIndex();
     if (page->document()->isUndoAvailable()) // document was changed and undo is available => document's contents have indeed changed
     {
-        tabWidget->setTabText(index, QFileInfo(page->property("filePath").toString()).fileName() + "*");
+        MarkSaveStatus(index, false);
     }
     else // if all changes have been undone, document can be considered as "not modified", thus we remove the *
     {
-        tabWidget->setTabText(index, QFileInfo(page->property("filePath").toString()).fileName());
+        MarkSaveStatus(index, true);
+    }
+}
+
+void Editor::MarkSaveStatus(int tabIndex, bool isSaved)
+{
+    EditorPage* page = static_cast<EditorPage*>(tabWidget->widget(tabIndex));
+    if (isSaved)
+    {
+        tabWidget->setTabText(tabIndex, QFileInfo(page->property("fileName").toString()).fileName());
+    }
+    else
+    {
+        tabWidget->setTabText(tabIndex, QFileInfo(page->property("fileName").toString()).fileName() + "*");
     }
 }
 
@@ -61,17 +114,23 @@ void Editor::CreateTab(const QString& filePath)
     EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension);
     int index = tabWidget->addTab(page, fileName);
     page->setProperty("filePath", info.absoluteFilePath());
+    page->setProperty("fileName", info.fileName());
     page->setPlainText(fileContents);
     connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
     tabWidget->setCurrentIndex(index);
     tabWidget->widget(index)->setWindowModified(true);
+
+    watcher->addPath(page->property("filePath").toString());
     page->setFocus();
+
 }
+
 void Editor::CreateBlankTab()
 {
     EditorPage* page = EditorPageFactory::CreateEditorPage(""); // create default page
     int index = tabWidget->addTab(page, "");
     page->setProperty("filePath", QString(""));
+    page->setProperty("fileName", "(Unsaved)");
     page->setPlainText("");
     connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
     tabWidget->setCurrentIndex(index);
@@ -81,6 +140,7 @@ void Editor::NewFile()
 {
     CreateBlankTab();
 }
+
 void Editor::OpenFile(const QString &filePath)
 {
     for (int i = 0; i < tabWidget->count(); i++)
@@ -96,6 +156,7 @@ void Editor::OpenFile(const QString &filePath)
 
     CreateTab(filePath);
 }
+
 void Editor::SaveFile()
 {
     EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
@@ -117,6 +178,7 @@ void Editor::SaveFile()
         QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
     }
 }
+
 void Editor::SaveFileAs()
 {
     EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
@@ -126,16 +188,21 @@ void Editor::SaveFileAs()
     QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
     try
     {
-        FileManager::WriteFile(file, page->toPlainText());
-        page->setProperty("filePath", file);
+        QFileInfo info(file);
+        FileManager::WriteFile(info.absoluteFilePath(), page->toPlainText());
+        page->setProperty("filePath", info.absoluteFilePath());
+        page->setProperty("fileName", info.fileName());
         page->document()->setModified(false);
-        tabWidget->setTabText(tabWidget->currentIndex(), QFileInfo(file).fileName());
+        tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+
+        watcher->addPath(info.absoluteFilePath());
     }
     catch (FileSystemException& ex)
     {
         QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
     }
 }
+
 void Editor::CloseTab(int index)
 {
     EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
@@ -159,5 +226,6 @@ void Editor::CloseTab(int index)
             return;
         }
     }
+    watcher->removePath(page->property("filePath").toString());
     delete tabWidget->widget(index);
 }

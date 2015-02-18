@@ -1,7 +1,7 @@
 #include "LineNumberArea.h"
 
 LineNumberArea::LineNumberArea(EditorPage *page)
-    : QWidget((QWidget*)page), page(page)
+    : QWidget(page), page(page)
 {
 
 }

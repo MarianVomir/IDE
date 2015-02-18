@@ -1,4 +1,4 @@
-#ifndef EDITOR_H
+﻿#ifndef EDITOR_H
 #define EDITOR_H
 
 #include "EditorPageFactory.h"
@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPaintEvent>
+#include <QFileSystemWatcher>
 
 #include "FileManager.h"
 class Editor : QWidget
@@ -15,16 +16,21 @@ class Editor : QWidget
 
 private:
     QTabWidget* tabWidget;
+    QFileSystemWatcher* watcher;
+
 public:
     Editor(QTabWidget* tabWidget);
     ~Editor();
 
 private slots:
     void CurrentDocChanged();
+    void OnFileChanged(QString filePath);
 
 private:
     void CreateTab(const QString& filePath);
     void CreateBlankTab();
+    int GetTabContainingFile(const QString& filePath);
+    void MarkSaveStatus(int tabIndex, bool isSaved);
 
 public slots:
     void NewFile();

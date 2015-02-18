@@ -24,7 +24,7 @@ EditorPage::EditorPage(QWidget* parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
-    m_countCache = QPair<int, int>(1, 1);
+    m_countCache = QPair<int, int>(-1, -1);
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
@@ -50,7 +50,7 @@ void EditorPage::updateLineNumberAreaWidth(int newBlockCount)
 }
 void EditorPage::updateLineNumberArea(const QRect& rect, int dy)
 {
-   /* if (dy)
+    /*if (dy)
         lineNumberArea->scroll(0, dy);
     else
         lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());

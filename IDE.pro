@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = IDE
 TEMPLATE = app
 
+CONFIG += c++11
 
 SOURCES += main.cpp\
     FileManager.cpp \
@@ -29,7 +30,10 @@ SOURCES += main.cpp\
     Editing/EditorPageCreator.cpp \
     Editing/EditorPage.cpp \
     Editing/CEditorPageCreator.cpp \
-    Editing/Utility/LineNumberArea.cpp
+    Editing/Utility/LineNumberArea.cpp \
+    Editing/CEditorPage.cpp \
+    Editing/Utility/CLexic.cpp \
+    Editing/Utility/CSyntaxHighlighter.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -51,7 +55,10 @@ HEADERS  += \
     Editing/EditorPageFactory.h \
     Editing/Editor.h \
     Editing/CEditorPageCreator.h \
-    Editing/Utility/LineNumberArea.h
+    Editing/Utility/LineNumberArea.h \
+    Editing/CEditorPage.h \
+    Editing/Utility/CLexic.h \
+    Editing/Utility/CSyntaxHighlighter.h
 
 FORMS    += \
     GUI/mainwindow.ui \

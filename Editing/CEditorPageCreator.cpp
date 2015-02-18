@@ -12,6 +12,6 @@ CEditorPageCreator::~CEditorPageCreator()
 
 EditorPage* CEditorPageCreator::CreateEditorPage()
 {
-    // code to create an editor textbox used to edit C code
+    return new CEditorPage();
 }
 
