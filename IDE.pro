@@ -35,7 +35,9 @@ SOURCES += main.cpp\
     Editing/Utility/CLexic.cpp \
     Editing/Utility/CSyntaxHighlighter.cpp \
     ProjectTesting/SimpleMakefileBuilder.cpp \
-    ProjectTesting/MakefileBasedProjectBuilder.cpp
+    ProjectTesting/MakefileBasedProjectBuilder.cpp \
+    ProjectTesting/ListOutputWriter.cpp \
+    ProjectTesting/ProjectBuilder.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -64,7 +66,9 @@ HEADERS  += \
     ProjectTesting/MakefileBuilder.h \
     ProjectTesting/SimpleMakefileBuilder.h \
     ProjectTesting/MakefileBasedProjectBuilder.h \
-    ProjectTesting/ProjectBuilder.h
+    ProjectTesting/ProjectBuilder.h \
+    ProjectTesting/OutputWriter.h \
+    ProjectTesting/ListOutputWriter.h
 
 FORMS    += \
     GUI/mainwindow.ui \

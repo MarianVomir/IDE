@@ -16,7 +16,7 @@
 
 #include <QQueue>
 
-class ProjectExplorer : QObject
+class ProjectExplorer : public QObject
 {
     Q_OBJECT
 

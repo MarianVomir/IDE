@@ -1,8 +1,45 @@
 #include "MakefileBasedProjectBuilder.h"
 
-MakefileBasedProjectBuilder::MakefileBasedProjectBuilder(MakefileBuilder *makefileBuilder)
+MakefileBasedProjectBuilder::MakefileBasedProjectBuilder(OutputWriter* outputWriter, MakefileBuilder *makefileBuilder)
+    : ProjectBuilder(outputWriter), makefileBuilder(makefileBuilder)
 {
-    this->makefileBuilder = makefileBuilder;
+    process = new QProcess();
+    process->setProcessChannelMode(QProcess::MergedChannels);
+
+    connect(process, SIGNAL(started()), this, SLOT(ProcessStarted()));
+    connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(ProcessOutputReady()));
+    connect(process, SIGNAL(readyReadStandardError()), this, SLOT(ProcessErrorReady()));
+    connect(process, SIGNAL(finished(int)), this, SLOT(ProcessFinished(int)));
+}
+
+MakefileBasedProjectBuilder::~MakefileBasedProjectBuilder()
+{
+    if (!process->waitForFinished())
+        delete process;
+}
+void MakefileBasedProjectBuilder::ProcessStarted()
+{
+    this->outputWriter->Clear();
+}
+void MakefileBasedProjectBuilder::ProcessOutputReady()
+{
+    for (QString& line : QString(process->readAllStandardOutput()).split('\n'))
+    {
+        if (line.trimmed() != "")
+            outputWriter->WriteLine(line);
+    }
+}
+void MakefileBasedProjectBuilder::ProcessErrorReady()
+{
+    for (QString& line : QString(process->readAllStandardError()).split('\n'))
+    {
+        if (line.trimmed() != "")
+            outputWriter->WriteLine(line.trimmed());
+    }
+}
+void MakefileBasedProjectBuilder::ProcessFinished(int errCode)
+{
+    outputWriter->WriteLine(QString("Process Finished: Error Code: %1").arg(errCode));
 }
 
 void MakefileBasedProjectBuilder::Build(const Project& proj)
@@ -75,33 +112,28 @@ void MakefileBasedProjectBuilder::Build(const Project& proj)
     {
         // show errors while creating makefile
     }
-
-    QProcess* process = new QProcess();
-    process->setProcessChannelMode(QProcess::MergedChannels);
     process->setWorkingDirectory(proj.Root());
-
     process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + proj.Name());
-
-    if (!process->waitForFinished())
-        qDebug() << "Make failed: " << process->errorString();
-    else
-        qDebug() << "Make output: " << process->readAll();
 }
 void MakefileBasedProjectBuilder::Clean(const Project& proj)
 {
-    QProcess* process = new QProcess();
-    process->setProcessChannelMode(QProcess::MergedChannels);
     process->setWorkingDirectory(proj.Root());
-
     process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + " clean "); // make target "clean"
-
-    if (!process->waitForFinished())
-        qDebug() << "Make failed: " << process->errorString();
-    else
-        qDebug() << "Make output: " << process->readAll();
 }
 void MakefileBasedProjectBuilder::Rebuild(const Project& proj)
 {
+    Clean(proj);
+    process->waitForFinished();
+    Build(proj);
+    /*process->setProcessChannelMode(QProcess::MergedChannels);
+    process->setWorkingDirectory(proj.Root());
+
+    process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + " clean ");
+
+    process->waitForFinished();
+
+    process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + proj.Name());*/
+    /*
     this->Clean(proj);
-    this->Build(proj);
+    this->Build(proj);*/
 }

@@ -23,7 +23,11 @@ void ProjectExplorer::CloseActiveProject()
         this->projectTree->setModel(NULL);
         delete this->projectModel;
     }
+    if (this->project != NULL)
+        delete this->project;
+
     this->projectModel = NULL;
+    this->project = NULL;
 }
 void ProjectExplorer::SetActiveProject(Project *project)
 {

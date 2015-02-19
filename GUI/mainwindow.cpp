@@ -6,16 +6,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    this->project = NULL;
-
     ui->setupUi(this);
     converter = new JSONConverter();
     projectExplorer = new ProjectExplorer();
     projectExplorer->SetTree(ui->projectTree);
     projectExplorer->SetProjectFileConverter(converter);
 
+    outputWriter = new ListOutputWriter(ui->outputWindow);
     makefileBuilder = new SimpleMakefileBuilder();
-    projectBuilder = new MakefileBasedProjectBuilder(makefileBuilder);
+    projectBuilder = new MakefileBasedProjectBuilder(outputWriter, makefileBuilder);
 
     editor = new Editor(ui->tabEditor);
 
@@ -59,7 +58,6 @@ void MainWindow::SetProjectExplorer(ProjectExplorer* projectExplorer)
 
 void MainWindow::SetNewProject(Project *project)
 {
-    this->project = project;
     if (FileManager::Exists(project->Root()) && FileManager::IsDir(project->Root())) // projectDir.exists())
     {
         QMessageBox::StandardButton answer = QMessageBox::question(
@@ -78,7 +76,6 @@ void MainWindow::SetNewProject(Project *project)
 }
 void MainWindow::SetOpenProject(Project* project)
 {
-    this->project = project;
     projectExplorer->SetActiveProject(project);
 }
 
@@ -100,8 +97,6 @@ void MainWindow::OnOpenProject()
 void MainWindow::OnCloseProject()
 {
     projectExplorer->CloseActiveProject();
-    delete this->project;
-    this->project = NULL;
 }
 void MainWindow::Exit()
 {
@@ -158,18 +153,21 @@ void MainWindow::on_actionNew_File_triggered()
 
 void MainWindow::on_actionBuild_triggered()
 {
-    if (this->project != NULL)
-        this->projectBuilder->Build(*this->project);
+    const Project* project = projectExplorer->GetProject();
+    if (project != NULL)
+        this->projectBuilder->Build(*project);
 }
 
 void MainWindow::on_actionClean_triggered()
 {
-    if (this->project != NULL)
-        this->projectBuilder->Clean(*this->project);
+    const Project* project = projectExplorer->GetProject();
+    if (project != NULL)
+        this->projectBuilder->Clean(*project);
 }
 
 void MainWindow::on_actionRebuild_triggered()
 {
-    if (this->project != NULL)
-        this->projectBuilder->Rebuild(*this->project);
+    const Project* project = projectExplorer->GetProject();
+    if (project != NULL)
+        this->projectBuilder->Rebuild(*project);
 }

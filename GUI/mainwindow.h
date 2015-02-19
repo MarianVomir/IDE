@@ -26,6 +26,7 @@
 #include "ProjectTesting/MakefileBasedProjectBuilder.h"
 #include "ProjectTesting/MakefileBuilder.h"
 #include "ProjectTesting/SimpleMakefileBuilder.h"
+#include "ProjectTesting/ListOutputWriter.h"
 
 #include "newprojectdialog.h"
 #include "openprojectdialog.h"
@@ -76,12 +77,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    Project* project;
     ProjectExplorer* projectExplorer;
     ProjectFileConverter* converter;
     Editor* editor;
     ProjectBuilder* projectBuilder;
     MakefileBuilder* makefileBuilder;
+    OutputWriter* outputWriter;
 
 public:
     void OnNewProject();
