@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
+#include <QProcess>
 
 #include "Testing/Tester_FileManager.h"
 

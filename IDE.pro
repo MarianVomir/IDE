@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     ProjectTesting/SimpleMakefileBuilder.cpp \
     ProjectTesting/MakefileBasedProjectBuilder.cpp \
     ProjectTesting/ListOutputWriter.cpp \
-    ProjectTesting/ProjectBuilder.cpp
+    ProjectTesting/ProjectBuilder.cpp \
+    ProjectTesting/ProjectRunner.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -68,7 +69,8 @@ HEADERS  += \
     ProjectTesting/MakefileBasedProjectBuilder.h \
     ProjectTesting/ProjectBuilder.h \
     ProjectTesting/OutputWriter.h \
-    ProjectTesting/ListOutputWriter.h
+    ProjectTesting/ListOutputWriter.h \
+    ProjectTesting/ProjectRunner.h
 
 FORMS    += \
     GUI/mainwindow.ui \

@@ -6,10 +6,10 @@ MakefileBasedProjectBuilder::MakefileBasedProjectBuilder(OutputWriter* outputWri
     process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
 
-    connect(process, SIGNAL(started()), this, SLOT(ProcessStarted()));
+   /* connect(process, SIGNAL(started()), this, SLOT(ProcessStarted()));
     connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(ProcessOutputReady()));
     connect(process, SIGNAL(readyReadStandardError()), this, SLOT(ProcessErrorReady()));
-    connect(process, SIGNAL(finished(int)), this, SLOT(ProcessFinished(int)));
+    connect(process, SIGNAL(finished(int)), this, SLOT(ProcessFinished(int)));*/
 }
 
 MakefileBasedProjectBuilder::~MakefileBasedProjectBuilder()
@@ -42,7 +42,7 @@ void MakefileBasedProjectBuilder::ProcessFinished(int errCode)
     outputWriter->WriteLine(QString("Process Finished: Error Code: %1").arg(errCode));
 }
 
-void MakefileBasedProjectBuilder::Build(const Project& proj)
+int MakefileBasedProjectBuilder::Build(const Project& proj)
 {
     QStringList sourceFiles;
     QStringList sourceDirs;
@@ -114,17 +114,39 @@ void MakefileBasedProjectBuilder::Build(const Project& proj)
     }
     process->setWorkingDirectory(proj.Root());
     process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + proj.Name());
+
+    if (process->waitForFinished())
+    {
+        for (QString& line : QString(process->readAll()).split('\n'))
+        {
+            if (line.trimmed() != "")
+                outputWriter->WriteLine(line.trimmed());
+        }
+    }
+
+    return process->exitCode();
 }
-void MakefileBasedProjectBuilder::Clean(const Project& proj)
+int MakefileBasedProjectBuilder::Clean(const Project& proj)
 {
     process->setWorkingDirectory(proj.Root());
     process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + " clean "); // make target "clean"
+
+    if (process->waitForFinished())
+    {
+        for (QString& line : QString(process->readAll()).split('\n'))
+        {
+            if (line.trimmed() != "")
+                outputWriter->WriteLine(line.trimmed());
+        }
+    }
+    return process->exitCode();
 }
-void MakefileBasedProjectBuilder::Rebuild(const Project& proj)
+int MakefileBasedProjectBuilder::Rebuild(const Project& proj)
 {
     Clean(proj);
     process->waitForFinished();
     Build(proj);
+    return process->exitCode();
     /*process->setProcessChannelMode(QProcess::MergedChannels);
     process->setWorkingDirectory(proj.Root());
 

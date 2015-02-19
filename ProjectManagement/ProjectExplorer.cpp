@@ -5,6 +5,7 @@ const QString ProjectExplorer::newFileBaseName = "NewFile";
 
 ProjectExplorer::ProjectExplorer()
 {
+    project = NULL;
     projectTree = NULL;
     converter = NULL;
     rightClickMenu = new QMenu(NULL);

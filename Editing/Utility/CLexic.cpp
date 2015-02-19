@@ -38,8 +38,11 @@ QVector<QString> Ckeywords (QVector<QString>()
 );
 
 QString functionPattern = "\\b[A-Za-z_][A-Za-z0-9_]*(?=[\\s\\r\\n\\t]*\\()";
+
 QString stringLiteralPattern = "\"([^\"\\\\]|\\\\.)*\"";
+
 QString charLiteralPattern = "\'([^\\\\]|\\\\.)\'";
+
 QVector<QString> CpreprocessDirectives (QVector<QString> ()
 
     << "#include <.+>"
@@ -51,6 +54,8 @@ QVector<QString> CpreprocessDirectives (QVector<QString> ()
     << "#pragma .+"
 
 );
+
 QString singleLineCommentPattern = "//[^\\n]*";
+
 QString commentStartPattern = "/\\*";
 QString commentEndPattern = "\\*/";

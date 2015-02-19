@@ -15,9 +15,9 @@ protected:
     OutputWriter* outputWriter;
 
 public:
-    virtual void Build(const Project& proj) = 0;
-    virtual void Clean(const Project& proj) = 0;
-    virtual void Rebuild(const Project& proj) = 0;
+    virtual int Build(const Project& proj) = 0;
+    virtual int Clean(const Project& proj) = 0;
+    virtual int Rebuild(const Project& proj) = 0;
 
     ProjectBuilder(OutputWriter* outputWriter) : outputWriter(outputWriter) {}
     virtual ~ProjectBuilder() = 0;

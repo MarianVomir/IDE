@@ -27,6 +27,7 @@
 #include "ProjectTesting/MakefileBuilder.h"
 #include "ProjectTesting/SimpleMakefileBuilder.h"
 #include "ProjectTesting/ListOutputWriter.h"
+#include "ProjectTesting/ProjectRunner.h"
 
 #include "newprojectdialog.h"
 #include "openprojectdialog.h"
@@ -42,7 +43,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void SetProjectExplorer(ProjectExplorer* projectExplorer);
     void SetOpenProject(Project *project);
     void SetNewProject(Project *project);
 
@@ -74,6 +74,8 @@ private slots:
 
     void on_actionRebuild_triggered();
 
+    void on_actionRun_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -83,6 +85,7 @@ private:
     ProjectBuilder* projectBuilder;
     MakefileBuilder* makefileBuilder;
     OutputWriter* outputWriter;
+    ProjectRunner* projectRunner;
 
 public:
     void OnNewProject();

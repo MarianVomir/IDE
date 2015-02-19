@@ -247,10 +247,16 @@
    <property name="text">
     <string>Run</string>
    </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
   </action>
   <action name="actionBuild">
    <property name="text">
     <string>Build</string>
+   </property>
+   <property name="shortcut">
+    <string>F7</string>
    </property>
   </action>
   <action name="actionClean">
@@ -261,6 +267,9 @@
   <action name="actionRebuild">
    <property name="text">
     <string>Rebuild</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
    </property>
   </action>
  </widget>

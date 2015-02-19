@@ -22,9 +22,9 @@ public:
     MakefileBasedProjectBuilder(OutputWriter* outputWriter, MakefileBuilder* makefileBuilder);
     virtual ~MakefileBasedProjectBuilder();
 
-    virtual void Build(const Project& proj);
-    virtual void Clean(const Project& proj);
-    virtual void Rebuild(const Project& proj);
+    virtual int Build(const Project& proj);
+    virtual int Clean(const Project& proj);
+    virtual int Rebuild(const Project& proj);
 
 private slots:
     void ProcessStarted();
