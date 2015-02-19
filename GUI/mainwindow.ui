@@ -86,9 +86,6 @@
           <verstretch>1</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
         <property name="dragDropMode">
          <enum>QAbstractItemView::DragDrop</enum>
         </property>
@@ -101,7 +98,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="documentMode">
          <bool>false</bool>
@@ -183,7 +180,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
-   <addaction name="actionRefreshProjectExplorer"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew_File">

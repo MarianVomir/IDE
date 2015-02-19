@@ -10,6 +10,20 @@ Editor::Editor(QTabWidget *tabWidget)
 
     connect(watcher, SIGNAL(fileChanged(QString)), this, SLOT(OnFileChanged(QString)));
 }
+Editor::~Editor()
+{
+    while (tabWidget->count())
+    {
+        tabWidget->setCurrentIndex(0);
+        SaveFile();
+        delete tabWidget->widget(0);
+    }
+    disconnect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
+
+    delete watcher;
+}
+
+
 int Editor::GetTabContainingFile(const QString &filePath)
 {
     for (int i = 0; i < tabWidget->count(); i++)
@@ -22,6 +36,7 @@ int Editor::GetTabContainingFile(const QString &filePath)
 
     return -1;
 }
+
 void Editor::OnFileChanged(QString filePath)
 {
     QMessageBox box;
@@ -36,7 +51,11 @@ void Editor::OnFileChanged(QString filePath)
     {
         if (answer == QMessageBox::Yes)
         {
-            MarkSaveStatus(tabIndex, false);
+            EditorPage* page = static_cast<EditorPage*>(tabWidget->widget(tabIndex));
+
+            page->setProperty("saved", false);
+            page->setProperty("onDisk", false);
+            tabWidget->setTabText(tabIndex, page->property("fileName").toString() + "*");
         }
         else if (answer == QMessageBox::No)
         {
@@ -45,38 +64,34 @@ void Editor::OnFileChanged(QString filePath)
     }
 }
 
-Editor::~Editor()
-{
-    while (tabWidget->count()) delete tabWidget->widget(0);
-    disconnect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
-
-    delete watcher;
-}
-
 void Editor::CurrentDocChanged()
 {
     EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
     int index = tabWidget->currentIndex();
-    if (page->document()->isUndoAvailable()) // document was changed and undo is available => document's contents have indeed changed
-    {
-        MarkSaveStatus(index, false);
-    }
-    else // if all changes have been undone, document can be considered as "not modified", thus we remove the *
-    {
-        MarkSaveStatus(index, true);
-    }
-}
 
-void Editor::MarkSaveStatus(int tabIndex, bool isSaved)
-{
-    EditorPage* page = static_cast<EditorPage*>(tabWidget->widget(tabIndex));
-    if (isSaved)
+    bool onDisk = page->property("onDisk").toBool();
+    bool isUndoAvailable = page->document()->isUndoAvailable();
+
+    if (!onDisk)
     {
-        tabWidget->setTabText(tabIndex, QFileInfo(page->property("fileName").toString()).fileName());
+        // put asterisk
+        tabWidget->setTabText(index, page->property("fileName").toString() + "*");
+        page->setProperty("saved", false);
     }
     else
     {
-        tabWidget->setTabText(tabIndex, QFileInfo(page->property("fileName").toString()).fileName() + "*");
+        if (!isUndoAvailable)
+        {
+            // remove asterisk
+            tabWidget->setTabText(index, page->property("fileName").toString());
+            page->setProperty("saved", true);
+        }
+        else
+        {
+            // put asterisk
+            tabWidget->setTabText(index, page->property("fileName").toString() + "*");
+            page->setProperty("saved", false);
+        }
     }
 }
 
@@ -96,7 +111,7 @@ void Editor::CreateTab(const QString& filePath)
             {
                 if (fileName[i] == '.') // found the last dot
                 {
-                    fileExtension = fileName.right(fileName.size() - i - 1);
+                    fileExtension = fileName.right(fileName.size() - i - 1); // get file extension, given the last dot's position
                     break;
                 }
             }
@@ -113,14 +128,19 @@ void Editor::CreateTab(const QString& filePath)
 
     EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension);
     int index = tabWidget->addTab(page, fileName);
+
     page->setProperty("filePath", info.absoluteFilePath());
     page->setProperty("fileName", info.fileName());
+    page->setProperty("saved", true);
+    page->setProperty("onDisk", true);
+
     page->setPlainText(fileContents);
     connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
+
     tabWidget->setCurrentIndex(index);
-    tabWidget->widget(index)->setWindowModified(true);
 
     watcher->addPath(page->property("filePath").toString());
+
     page->setFocus();
 
 }
@@ -128,10 +148,20 @@ void Editor::CreateTab(const QString& filePath)
 void Editor::CreateBlankTab()
 {
     EditorPage* page = EditorPageFactory::CreateEditorPage(""); // create default page
+    if (page == NULL)
+        return;
+
     int index = tabWidget->addTab(page, "");
+
     page->setProperty("filePath", QString(""));
     page->setProperty("fileName", "(Unsaved)");
+    page->setProperty("saved", false);
+    page->setProperty("onDisk", false);
+
     page->setPlainText("");
+
+    tabWidget->setTabText(index, page->property("fileName").toString() + "*");
+
     connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
     tabWidget->setCurrentIndex(index);
     page->setFocus();
@@ -164,18 +194,35 @@ void Editor::SaveFile()
         return;
 
     QString filePath = page->property("filePath").toString();
-    if (filePath == "")
-        this->SaveFileAs();
-    else
-    try
+    bool saved = page->property("saved").toBool();
+    bool onDisk = page->property("onDisk").toBool();
+
+    if (filePath != "" && saved && onDisk)
     {
-        FileManager::WriteFile(filePath, page->toPlainText());
-        page->document()->setModified(false);
-        tabWidget->setTabText(tabWidget->currentIndex(), QFileInfo(filePath).fileName());
+        return;
     }
-    catch (FileSystemException& ex)
+    else if (filePath != "" && !saved)
     {
-        QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+        try
+        {
+            watcher->removePath(filePath);
+            FileManager::WriteFile(filePath, page->toPlainText());
+            watcher->addPath(filePath);
+
+            page->setProperty("saved", true);
+            page->setProperty("onDisk", true);
+
+            page->document()->setModified(false);
+            tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+        }
+        catch (FileSystemException& ex)
+        {
+            QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+        }
+    }
+    else if (filePath == "")
+    {
+        this->SaveFileAs();
     }
 }
 
@@ -186,46 +233,107 @@ void Editor::SaveFileAs()
         return;
 
     QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
-    try
+    if (file != "")
     {
-        QFileInfo info(file);
-        FileManager::WriteFile(info.absoluteFilePath(), page->toPlainText());
-        page->setProperty("filePath", info.absoluteFilePath());
-        page->setProperty("fileName", info.fileName());
-        page->document()->setModified(false);
-        tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+        try
+        {
+            QFileInfo info(file);
+            watcher->removePath(info.absoluteFilePath());
+            FileManager::WriteFile(info.absoluteFilePath(), page->toPlainText());
+            watcher->addPath(info.absoluteFilePath());
+            page->setProperty("filePath", info.absoluteFilePath());
+            page->setProperty("fileName", info.fileName());
+            page->setProperty("saved", true);
+            page->setProperty("onDisk", true);
 
-        watcher->addPath(info.absoluteFilePath());
-    }
-    catch (FileSystemException& ex)
-    {
-        QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+            page->document()->setModified(false);
+            tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+
+            watcher->addPath(info.absoluteFilePath());
+        }
+        catch (FileSystemException& ex)
+        {
+            QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+        }
     }
 }
 
 void Editor::CloseTab(int index)
 {
-    EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
+    EditorPage* page = static_cast<EditorPage*>(tabWidget->widget(index));
     if (page == NULL)
         return;
 
-    if (page->document()->isModified())
+    QString filePath = page->property("filePath").toString();
+    bool saved = page->property("saved").toBool();
+    bool onDisk = page->property("onDisk").toBool();
+
+    if (filePath != "" && saved && onDisk)
+    {
+        delete page;
+    }
+    else if (filePath != "" && !saved)
+    {
+        try
+        {
+            QMessageBox box;
+            box.setText("Save changes before closing?");
+            box.setStandardButtons(QMessageBox::Save|QMessageBox::Cancel|QMessageBox::Discard);
+            box.setDefaultButton(QMessageBox::Save);
+            int answer = box.exec();
+            if (answer == QMessageBox::Save)
+            {
+                SaveFile();
+            }
+            else if (answer == QMessageBox::Cancel)
+            {
+                return;
+            }
+             watcher->removePath(page->property("filePath").toString());
+            delete page;
+        }
+        catch (FileSystemException& ex)
+        {
+            QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+        }
+    }
+    else if (filePath == "")
     {
         QMessageBox box;
-        box.setText("File was modified. Save changes before closing?");
+        box.setText("Save changes before closing?");
         box.setStandardButtons(QMessageBox::Save|QMessageBox::Cancel|QMessageBox::Discard);
         box.setDefaultButton(QMessageBox::Save);
 
         int answer = box.exec();
         if (answer == QMessageBox::Save)
         {
-            SaveFile();
+            QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
+            if (file != "")
+            {
+                try
+                {
+                    QFileInfo info(file);
+                    FileManager::WriteFile(info.absoluteFilePath(), page->toPlainText());
+
+                    delete page;
+                }
+                catch (FileSystemException& ex)
+                {
+                    QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+                }
+            }
+            else
+            {
+                return;
+            }
         }
         else if (answer == QMessageBox::Cancel)
         {
             return;
         }
+        else
+        {
+            delete page;
+        }
     }
-    watcher->removePath(page->property("filePath").toString());
-    delete tabWidget->widget(index);
 }

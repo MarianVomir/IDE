@@ -30,7 +30,6 @@ private:
     void CreateTab(const QString& filePath);
     void CreateBlankTab();
     int GetTabContainingFile(const QString& filePath);
-    void MarkSaveStatus(int tabIndex, bool isSaved);
 
 public slots:
     void NewFile();
