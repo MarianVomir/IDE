@@ -22,6 +22,8 @@ public:
     Editor(QTabWidget* tabWidget);
     ~Editor();
 
+    bool AskSaveAll();
+
 private slots:
     void CurrentDocChanged();
     void OnFileChanged(QString filePath);
@@ -34,8 +36,8 @@ private:
 public slots:
     void NewFile();
     void OpenFile(const QString& filePath);
-    void SaveFile();
-    void SaveFileAs();
+    bool SaveFile();
+    bool SaveFileAs();
     void CloseTab(int index);
 
 };

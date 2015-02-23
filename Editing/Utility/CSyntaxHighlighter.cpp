@@ -10,15 +10,13 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     QTextCharFormat normalFormat;
     normalFormat.setForeground(Qt::black);
     normalFormat.setFontItalic(false);
-    normalFormat.setFontWeight(0);
-
+    normalFormat.setFontWeight(QFont::Normal);
     rule.format = normalFormat;
     rule.pattern = QRegExp(".");
-
     highlightingRules.append(rule);
 
     // STRING LITERALS
-    stringLiteralFormat.setForeground(Qt::red);
+    stringLiteralFormat.setForeground(QBrush(QColor(255, 128, 128)));
     stringLiteralFormat.setFontWeight(QFont::Bold);
     pattern = stringLiteralPattern;
     rule.pattern = QRegExp(pattern);
@@ -26,7 +24,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // CHAR LITERALS
-    charLiteralFormat.setForeground(Qt::green);
+    charLiteralFormat.setForeground(QBrush(QColor(255, 128, 255)));
     charLiteralFormat.setFontWeight(QFont::Bold);
     pattern = charLiteralPattern;
     rule.pattern = QRegExp(pattern);
@@ -34,7 +32,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // FUNCTIONS
-    functionFormat.setForeground(Qt::magenta);
+    functionFormat.setForeground(QBrush(QColor(100, 0, 128)));
     functionFormat.setFontWeight(QFont::Bold);
     pattern = functionPattern;
     rule.pattern = QRegExp(pattern);
@@ -42,7 +40,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // KEYWORDS
-    keywordFormat.setForeground(Qt::darkBlue);
+    keywordFormat.setForeground(QBrush(QColor(30, 80, 50)));
     keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
 
@@ -59,7 +57,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     }
 
     // PREPROCESSOR DIRECTIVES
-    preprocessFormat.setForeground(QBrush(QColor(20, 200, 40)));
+    preprocessFormat.setForeground(QBrush(QColor(0, 60, 90)));
 
     for (auto& directive : CpreprocessDirectives)
     {

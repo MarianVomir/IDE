@@ -39,12 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 MainWindow::~MainWindow()
 {
+    delete editor;
+
     delete projectExplorer;
     delete converter;
     delete projectBuilder;
     delete makefileBuilder;
-    delete editor;
-
     delete ui;
 }
 
@@ -87,15 +87,25 @@ void MainWindow::OnNewProject()
 void MainWindow::OnOpenProject()
 {
     OpenProjectDialog openProjDialog(this, this->converter);
-    if (openProjDialog.FileHasBeenSelected())
-    {
-        openProjDialog.setModal(true);
-        openProjDialog.exec();
-    }
+    openProjDialog.setModal(true);
+    openProjDialog.exec();
 }
 void MainWindow::OnCloseProject()
 {
     projectExplorer->CloseActiveProject();
+}
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    if (this->editor->AskSaveAll() == true)
+    {
+        // all files have been iterated through and have either been saved or discarded
+        event->accept();
+    }
+    else
+    {
+        // if AskSaveAll returns false, it means the user clicked the Cancel button for a tab, therefore we don't close.
+        event->ignore();
+    }
 }
 void MainWindow::Exit()
 {

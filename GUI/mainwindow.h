@@ -93,6 +93,7 @@ public:
     void OnCloseProject();
     void Exit();
 
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // MAINWINDOW_H

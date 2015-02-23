@@ -24,29 +24,59 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent, ProjectFileConverter* conv
     ui->txt_Compiler->setCompleter(completer);
     ui->txt_Make->setCompleter(completer);
     ui->txt_Debugger->setCompleter(completer);
-
+}
+int OpenProjectDialog::exec()
+{
     QFileDialog filePicker;
     filePicker.setFileMode(QFileDialog::AnyFile);
     filePicker.setNameFilter(QString("Project files (*.proj)"));
     filePicker.setDirectory(QDir::homePath());
 
-    fileHasBeenSelected = false;
-    projFilePath = filePicker.getOpenFileName();
-    if (projFilePath.size() > 0)
+    bool fileHasBeenSelected = false;
+    while (1)
     {
-        fileHasBeenSelected = true;
+        projFilePath = filePicker.getOpenFileName();
+        if (projFilePath.size() > 0)
+        {
+            QFileInfo info(projFilePath);
+            if (!info.fileName().endsWith(".proj")) // file name does not end with .proj
+            {
+                QMessageBox::warning(
+                            NULL,
+                            "Not a valid file",
+                            "Project file must have '.proj' extension"
+                        );
+            }
+            else
+            {
+                fileHasBeenSelected = true;
+                break;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
 
-        project = converter->FileToProject(projFilePath);
+    project = converter->FileToProject(projFilePath);
 
-        ui->txt_ProjectName->setText(project->Name());
-        ui->txt_ProjectRoot->setText(project->Root());
-        ui->txt_Compiler->setText(project->Compiler());
-        ui->txt_Debugger->setText(project->Debugger());
-        ui->txt_Make->setText(project->MakeUtility());
-        ui->txt_CompilerFlags->setText(project->CompilerFlags());
-        ui->txt_LinkerFlags->setText(project->LinkerFlags());
-     }
+    ui->txt_ProjectName->setText(project->Name());
+    ui->txt_ProjectRoot->setText(project->Root());
+    ui->txt_Compiler->setText(project->Compiler());
+    ui->txt_Debugger->setText(project->Debugger());
+    ui->txt_Make->setText(project->MakeUtility());
+    ui->txt_CompilerFlags->setText(project->CompilerFlags());
+    ui->txt_LinkerFlags->setText(project->LinkerFlags());
+
+    if (!fileHasBeenSelected) // no .proj file was selected, therefore it makes no sense to display the dialog
+    {
+        return QDialog::Rejected;
+    }
+
+    return QDialog::exec(); // call the standard exec to display the dialog and return Accepted or Rejected based on what QDialog::exec() returns
 }
+
 void OpenProjectDialog::OnBrowseCompilerClicked()
 {
     QString compiler = QFileDialog::getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
@@ -56,6 +86,7 @@ void OpenProjectDialog::OnBrowseCompilerClicked()
         ui->txt_Compiler->setText(compiler);
     }
 }
+
 void OpenProjectDialog::OnBrowseDebuggerClicked()
 {
     QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
@@ -64,6 +95,7 @@ void OpenProjectDialog::OnBrowseDebuggerClicked()
         ui->txt_Debugger->setText(debugger);
     }
 }
+
 void OpenProjectDialog::OnBrowseMakeClicked()
 {
     QString make = QFileDialog::getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
@@ -73,6 +105,7 @@ void OpenProjectDialog::OnBrowseMakeClicked()
         ui->txt_Make->setText(make);
     }
 }
+
 void OpenProjectDialog::OnOkButtonClicked()
 {
     QString projectName = ui->txt_ProjectName->text().trimmed();
@@ -114,11 +147,6 @@ void OpenProjectDialog::OnOkButtonClicked()
 OpenProjectDialog::~OpenProjectDialog()
 {
     delete ui;
-}
-
-bool OpenProjectDialog::FileHasBeenSelected()
-{
-    return fileHasBeenSelected;
 }
 
 void OpenProjectDialog::on_btn_Cancel_clicked()

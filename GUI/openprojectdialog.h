@@ -23,7 +23,7 @@ public:
     explicit OpenProjectDialog(QWidget *parent,  ProjectFileConverter* converter);
     ~OpenProjectDialog();
 
-    bool FileHasBeenSelected();
+    int exec();
 
 private slots:
     void OnBrowseMakeClicked();
@@ -39,7 +39,6 @@ private:
     ProjectFileConverter* converter;
     Project* project;
     QString projFilePath;
-    bool fileHasBeenSelected;
 };
 
 #endif // OPENPROJECTDIALOG_H

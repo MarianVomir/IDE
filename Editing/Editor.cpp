@@ -15,12 +15,43 @@ Editor::~Editor()
     while (tabWidget->count())
     {
         tabWidget->setCurrentIndex(0);
-        SaveFile();
         delete tabWidget->widget(0);
     }
     disconnect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
 
     delete watcher;
+}
+
+bool Editor::AskSaveAll()
+{
+    for (int i = 0; i < tabWidget->count(); i++)
+    {
+        EditorPage* page = static_cast<EditorPage*>(tabWidget->widget(i));
+
+        if (page->property("saved").toBool() == false || page->property("onDisk").toBool() == false)
+        {
+            tabWidget->setCurrentIndex(i);
+
+            QMessageBox box;
+            box.setText("Do you want to save " + page->property("filePath").toString() + " before exiting?");
+            box.setStandardButtons(QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+            box.setDefaultButton(QMessageBox::Yes);
+
+            int answer = box.exec();
+
+            if (answer == QMessageBox::Yes)
+            {
+                if (SaveFile() == false)
+                    return false;
+            }
+            else if (answer == QMessageBox::Cancel)
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 
@@ -187,11 +218,11 @@ void Editor::OpenFile(const QString &filePath)
     CreateTab(filePath);
 }
 
-void Editor::SaveFile()
+bool Editor::SaveFile()
 {
     EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
     if (page == NULL)
-        return;
+        return false;
 
     QString filePath = page->property("filePath").toString();
     bool saved = page->property("saved").toBool();
@@ -199,7 +230,7 @@ void Editor::SaveFile()
 
     if (filePath != "" && saved && onDisk)
     {
-        return;
+        return true;
     }
     else if (filePath != "" && !saved)
     {
@@ -214,23 +245,28 @@ void Editor::SaveFile()
 
             page->document()->setModified(false);
             tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+
+            return true;
         }
         catch (FileSystemException& ex)
         {
             QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+            return false;
         }
     }
     else if (filePath == "")
     {
-        this->SaveFileAs();
+        return this->SaveFileAs();
     }
+
+    return false;
 }
 
-void Editor::SaveFileAs()
+bool Editor::SaveFileAs()
 {
     EditorPage* page = static_cast<EditorPage*>(tabWidget->currentWidget());
     if (page == NULL)
-        return;
+        return false;
 
     QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
     if (file != "")
@@ -250,11 +286,19 @@ void Editor::SaveFileAs()
             tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
 
             watcher->addPath(info.absoluteFilePath());
+
+            return true;
         }
         catch (FileSystemException& ex)
         {
             QMessageBox::warning(NULL, "Cannot write to file", ex.Message());
+
+            return false;
         }
+    }
+    else
+    {
+        return false;
     }
 }
 
