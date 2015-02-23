@@ -32,8 +32,19 @@ bool Editor::AskSaveAll()
         {
             tabWidget->setCurrentIndex(i);
 
+            QString filePath = page->property("filePath").toString();
+            QString message = "";
+            if (filePath == "")
+            {
+                message = "File has not been saved yet. Save before exiting?";
+            }
+            else
+            {
+                message = "Do you want to save changes to " + filePath + " before exiting?";
+            }
+
             QMessageBox box;
-            box.setText("Do you want to save " + page->property("filePath").toString() + " before exiting?");
+            box.setText(message);
             box.setStandardButtons(QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
             box.setDefaultButton(QMessageBox::Yes);
 
@@ -53,7 +64,6 @@ bool Editor::AskSaveAll()
 
     return true;
 }
-
 
 int Editor::GetTabContainingFile(const QString &filePath)
 {
@@ -126,27 +136,52 @@ void Editor::CurrentDocChanged()
     }
 }
 
-void Editor::CreateTab(const QString& filePath)
+QString Editor::GetFileExtension(const QString& filePath)
+{
+    QString fileExtension = "";
+    QString fileName = "";
+
+    fileName = QFileInfo(filePath).fileName();
+
+    if (fileName.size() > 0)
+    {
+        for (int i = fileName.size(); i >= 1; i--) // i >= 1 to not consider hidden files as extensions themselves, such as '.profiles', for example
+        {
+            if (fileName[i] == '.') // found the last dot
+            {
+                fileExtension = fileName.right(fileName.size() - i - 1); // get file extension, given the last dot's position
+                break;
+            }
+        }
+    }
+
+    return fileExtension;
+}
+
+void Editor::AddTab(const QString& filePath)
+{
+    EditorPage* page = CreateTab(filePath);
+
+    int index = tabWidget->addTab(page, QFileInfo(filePath).fileName());
+    tabWidget->setTabText(index, page->property("fileName").toString());
+    tabWidget->setCurrentIndex(index);
+    page->setFocus();
+
+    watcher->addPath(page->property("filePath").toString());
+}
+
+EditorPage* Editor::CreateTab(const QString& filePath)
 {
     QFileInfo info(filePath);
     QString fileExtension = "";
     QString fileName = "";
     QString fileContents = "";
+
     if (info.exists())
     {
         fileName = info.fileName();
+        fileExtension = this->GetFileExtension(filePath);
 
-        if (fileName.size() > 0)
-        {
-            for (int i = fileName.size(); i >= 1; i--) // i >= 1 to not consider hidden files as extensions themselves, such as '.profiles', for example
-            {
-                if (fileName[i] == '.') // found the last dot
-                {
-                    fileExtension = fileName.right(fileName.size() - i - 1); // get file extension, given the last dot's position
-                    break;
-                }
-            }
-        }
         try
         {
             fileContents = FileManager::ReadFile(filePath);
@@ -158,7 +193,8 @@ void Editor::CreateTab(const QString& filePath)
     }
 
     EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension);
-    int index = tabWidget->addTab(page, fileName);
+    if (page == NULL)
+        return NULL;
 
     page->setProperty("filePath", info.absoluteFilePath());
     page->setProperty("fileName", info.fileName());
@@ -166,37 +202,37 @@ void Editor::CreateTab(const QString& filePath)
     page->setProperty("onDisk", true);
 
     page->setPlainText(fileContents);
+
     connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
 
-    tabWidget->setCurrentIndex(index);
-
-    watcher->addPath(page->property("filePath").toString());
-
-    page->setFocus();
-
+    return page;
 }
 
 void Editor::CreateBlankTab()
 {
-    EditorPage* page = EditorPageFactory::CreateEditorPage(""); // create default page
+    QString fileExtension = "";
+    QString fileName = "(Unsaved)";
+    QString fileContents = "";
+
+    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension); // create default page
     if (page == NULL)
         return;
 
-    int index = tabWidget->addTab(page, "");
-
     page->setProperty("filePath", QString(""));
-    page->setProperty("fileName", "(Unsaved)");
+    page->setProperty("fileName", fileName);
     page->setProperty("saved", false);
     page->setProperty("onDisk", false);
 
-    page->setPlainText("");
-
-    tabWidget->setTabText(index, page->property("fileName").toString() + "*");
+    page->setPlainText(fileContents);
 
     connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
+
+    int index = tabWidget->addTab(page, "");
+    tabWidget->setTabText(index, page->property("fileName").toString() + "*");
     tabWidget->setCurrentIndex(index);
     page->setFocus();
 }
+
 void Editor::NewFile()
 {
     CreateBlankTab();
@@ -215,7 +251,7 @@ void Editor::OpenFile(const QString &filePath)
         }
     }
 
-    CreateTab(filePath);
+    AddTab(filePath);
 }
 
 bool Editor::SaveFile()
@@ -277,17 +313,34 @@ bool Editor::SaveFileAs()
             watcher->removePath(info.absoluteFilePath());
             FileManager::WriteFile(info.absoluteFilePath(), page->toPlainText());
             watcher->addPath(info.absoluteFilePath());
-            page->setProperty("filePath", info.absoluteFilePath());
-            page->setProperty("fileName", info.fileName());
-            page->setProperty("saved", true);
-            page->setProperty("onDisk", true);
 
-            page->document()->setModified(false);
-            tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+            QString ext1 = this->GetFileExtension(page->property("filePath").toString());
+            QString ext2 = this->GetFileExtension(file);
+            if (ext1 != ext2)
+            {
+                EditorPage* newPage = this->CreateTab(file);
 
-            watcher->addPath(info.absoluteFilePath());
+                tabWidget->insertTab(tabWidget->indexOf(page), newPage, newPage->property("fileName").toString());
 
-            return true;
+                delete page;
+
+                return true;
+            }
+            else
+            {
+                page->setProperty("filePath", info.absoluteFilePath());
+                page->setProperty("fileName", info.fileName());
+                page->setProperty("saved", true);
+                page->setProperty("onDisk", true);
+
+                page->document()->setModified(false);
+
+                tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
+
+                watcher->addPath(info.absoluteFilePath());
+
+                return true;
+            }
         }
         catch (FileSystemException& ex)
         {

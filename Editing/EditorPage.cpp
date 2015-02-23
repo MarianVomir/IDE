@@ -7,7 +7,8 @@ EditorPage::EditorPage(QWidget* parent) : QPlainTextEdit(parent)
     // set page font
     QFont font;
 
-    font.setFamily("Courier");
+    font.setFamily("Consolas");
+    font.setWeight(QFont::Normal);
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
     font.setPointSize(10);

@@ -3,7 +3,6 @@
 DefaultEditorPage::DefaultEditorPage(QWidget *parent)
     : EditorPage(parent)
 {
-
 }
 
 DefaultEditorPage::~DefaultEditorPage()

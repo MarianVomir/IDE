@@ -18,6 +18,8 @@ private:
     QTabWidget* tabWidget;
     QFileSystemWatcher* watcher;
 
+    QString GetFileExtension(const QString &filePath);
+
 public:
     Editor(QTabWidget* tabWidget);
     ~Editor();
@@ -29,7 +31,7 @@ private slots:
     void OnFileChanged(QString filePath);
 
 private:
-    void CreateTab(const QString& filePath);
+    EditorPage* CreateTab(const QString& filePath);
     void CreateBlankTab();
     int GetTabContainingFile(const QString& filePath);
 
@@ -39,6 +41,7 @@ public slots:
     bool SaveFile();
     bool SaveFileAs();
     void CloseTab(int index);
+    void AddTab(const QString& filePath);
 
 };
 
