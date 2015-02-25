@@ -24,8 +24,6 @@
 
 #include "ProjectTesting/ProjectBuilder.h"
 #include "ProjectTesting/MakefileBasedProjectBuilder.h"
-#include "ProjectTesting/MakefileBuilder.h"
-#include "ProjectTesting/SimpleMakefileBuilder.h"
 #include "ProjectTesting/ListOutputWriter.h"
 #include "ProjectTesting/ProjectRunner.h"
 
@@ -83,7 +81,6 @@ private:
     ProjectFileConverter* converter;
     Editor* editor;
     ProjectBuilder* projectBuilder;
-    MakefileBuilder* makefileBuilder;
     OutputWriter* outputWriter;
     ProjectRunner* projectRunner;
 

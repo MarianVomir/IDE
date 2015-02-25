@@ -14,6 +14,10 @@ class ProjectBuilder : public QObject
 protected:
     OutputWriter* outputWriter;
 
+signals:
+    void buildStarted();
+    void buildFinished(int);
+
 public:
     virtual int Build(const Project& proj) = 0;
     virtual int Clean(const Project& proj) = 0;

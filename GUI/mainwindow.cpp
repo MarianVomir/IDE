@@ -15,8 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     outputWriter = new ListOutputWriter(ui->outputWindow);
 
-    makefileBuilder = new SimpleMakefileBuilder();
-    projectBuilder = new MakefileBasedProjectBuilder(outputWriter, makefileBuilder);
+    projectBuilder = new MakefileBasedProjectBuilder(outputWriter);
 
     projectRunner = new ProjectRunner(projectBuilder, outputWriter);
 
@@ -44,7 +43,6 @@ MainWindow::~MainWindow()
     delete projectExplorer;
     delete converter;
     delete projectBuilder;
-    delete makefileBuilder;
     delete ui;
 }
 

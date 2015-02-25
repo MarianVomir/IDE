@@ -15,6 +15,14 @@ protected:
     OutputWriter* outputWriter;
     QProcess* process;
 
+private slots:
+    void OnProcessStarted();
+    void OnProcessFinished(int);
+
+signals:
+    void runStarted();
+    void runFinished(int);
+
 public:
     void Run(const Project &proj, const QString& commandLineArgs = "");
 

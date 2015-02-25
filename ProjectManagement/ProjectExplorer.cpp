@@ -73,12 +73,13 @@ void ProjectExplorer::SetTree(QTreeView* tree)
     {
         disconnect(this->projectTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(OnProjectTreeRightClick(QPoint)));
     }
+
     this->projectTree = tree;
-    this->projectTree->setDragDropMode(QAbstractItemView::NoDragDrop);
-    this->projectTree->setEditTriggers(QTreeView::NoEditTriggers);
 
     if (this->projectTree != NULL)
     {
+        //this->projectTree->setDragDropMode(QAbstractItemView::NoDragDrop);
+        this->projectTree->setEditTriggers(QTreeView::NoEditTriggers);
         connect(this->projectTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(OnProjectTreeRightClick(QPoint)));
     }
 }

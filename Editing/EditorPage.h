@@ -13,6 +13,8 @@ class LineNumberArea; // forward declaration because we have circular dependency
 
 class EditorPage : public QPlainTextEdit
 {
+    Q_OBJECT
+
 public:
     EditorPage(QWidget* parent = 0);
     virtual ~EditorPage() = 0;
@@ -26,7 +28,7 @@ protected:
     void resizeEvent(QResizeEvent *);
 
 private slots:
-    void updateLineNumberAreaWidth(int newBlockCount);
+    void updateLineNumberAreaWidth(int);
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect& rect, int dy);
 

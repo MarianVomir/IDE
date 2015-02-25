@@ -10,6 +10,7 @@ Editor::Editor(QTabWidget *tabWidget)
 
     connect(watcher, SIGNAL(fileChanged(QString)), this, SLOT(OnFileChanged(QString)));
 }
+
 Editor::~Editor()
 {
     while (tabWidget->count())

@@ -23,7 +23,7 @@ EditorPage::EditorPage(QWidget* parent) : QPlainTextEdit(parent)
     lineNumberArea = new LineNumberArea(this);
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
-    connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect,int)));
+    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
     m_countCache = QPair<int, int>(-1, -1);
@@ -46,7 +46,7 @@ int EditorPage::lineNumberAreaWidth()
 
     return space;
 }
-void EditorPage::updateLineNumberAreaWidth(int newBlockCount)
+void EditorPage::updateLineNumberAreaWidth(int /*newBlockCount*/)
 {
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }

@@ -34,7 +34,6 @@ SOURCES += main.cpp\
     Editing/CEditorPage.cpp \
     Editing/Utility/CLexic.cpp \
     Editing/Utility/CSyntaxHighlighter.cpp \
-    ProjectTesting/SimpleMakefileBuilder.cpp \
     ProjectTesting/MakefileBasedProjectBuilder.cpp \
     ProjectTesting/ListOutputWriter.cpp \
     ProjectTesting/ProjectBuilder.cpp \
@@ -64,8 +63,6 @@ HEADERS  += \
     Editing/CEditorPage.h \
     Editing/Utility/CLexic.h \
     Editing/Utility/CSyntaxHighlighter.h \
-    ProjectTesting/MakefileBuilder.h \
-    ProjectTesting/SimpleMakefileBuilder.h \
     ProjectTesting/MakefileBasedProjectBuilder.h \
     ProjectTesting/ProjectBuilder.h \
     ProjectTesting/OutputWriter.h \
