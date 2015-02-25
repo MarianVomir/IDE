@@ -31,7 +31,10 @@ EditorPage::EditorPage(QWidget* parent) : QPlainTextEdit(parent)
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
 }
-EditorPage::~EditorPage() {}
+EditorPage::~EditorPage()
+{
+    delete lineNumberArea;
+}
 
 int EditorPage::lineNumberAreaWidth()
 {

@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     ProjectTesting/MakefileBasedProjectBuilder.cpp \
     ProjectTesting/ListOutputWriter.cpp \
     ProjectTesting/ProjectBuilder.cpp \
-    ProjectTesting/ProjectRunner.cpp
+    ProjectTesting/ProjectRunner.cpp \
+    Editing/Utility/BreakpointArea.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -67,7 +68,8 @@ HEADERS  += \
     ProjectTesting/ProjectBuilder.h \
     ProjectTesting/OutputWriter.h \
     ProjectTesting/ListOutputWriter.h \
-    ProjectTesting/ProjectRunner.h
+    ProjectTesting/ProjectRunner.h \
+    Editing/Utility/BreakpointArea.h
 
 FORMS    += \
     GUI/mainwindow.ui \
