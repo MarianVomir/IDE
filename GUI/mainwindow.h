@@ -74,6 +74,9 @@ private slots:
 
     void on_actionRun_triggered();
 
+    void OnProjectInUse();
+    void OnProjectFinishedUse(int);
+
 private:
     Ui::MainWindow *ui;
 

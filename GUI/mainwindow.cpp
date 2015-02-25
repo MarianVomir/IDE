@@ -35,6 +35,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->setMovable(false);
 
     connect(projectExplorer->GetTree(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnProjectExplorerDoubleClicked(QModelIndex)));
+    connect(projectRunner, SIGNAL(runStarted()), this, SLOT(OnProjectInUse()));
+    connect(projectRunner, SIGNAL(runFinished(int)), this, SLOT(OnProjectFinishedUse(int)));
+    connect(projectBuilder, SIGNAL(buildStarted()), this, SLOT(OnProjectInUse()));
+    connect(projectBuilder, SIGNAL(buildFinished(int)), this, SLOT(OnProjectFinishedUse(int)));
 }
 MainWindow::~MainWindow()
 {
@@ -186,4 +190,16 @@ void MainWindow::on_actionRun_triggered()
         outputWriter->Clear();
         this->projectRunner->Run(*project);
     }
+}
+
+void MainWindow::OnProjectInUse()
+{
+    QMenu* projectMenu = ui->menuBar->findChildren<QMenu*>().at(1);
+    projectMenu->setEnabled(false);
+}
+
+void MainWindow::OnProjectFinishedUse(int)
+{
+    QMenu* projectMenu = ui->menuBar->findChildren<QMenu*>().at(1);
+    projectMenu->setEnabled(true);
 }
