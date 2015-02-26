@@ -12,7 +12,7 @@
 #include <QString>
 #include <QMenu>
 #include <QPoint>
-
+#include <QFileSystemWatcher>
 
 #include <QQueue>
 
@@ -31,6 +31,8 @@ private:
     QDirModel* projectModel;
     ProjectFileConverter* converter;
 
+    QFileSystemWatcher* watcher;
+
 private slots:
     void OnProjectTreeRightClick(QPoint p);
 
@@ -43,6 +45,8 @@ private slots:
     void OnRenameClicked();
     QModelIndex GetTreeSelectedIndex();
 
+    void AddPathsToWatcher(const QString& root);
+
 public:
     ProjectExplorer();
     virtual ~ProjectExplorer();
@@ -52,7 +56,7 @@ public:
     void SetTree(QTreeView* tree);
     void SetProjectFileConverter(ProjectFileConverter* converter);
     const Project* GetProject() const;
-    const QTreeView* GetTree() const;
+    QTreeView *GetTree();
 
     QFileInfo FileAt(QModelIndex index);
 

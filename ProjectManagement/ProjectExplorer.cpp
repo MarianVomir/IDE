@@ -10,7 +10,28 @@ ProjectExplorer::ProjectExplorer()
     converter = NULL;
     rightClickMenu = new QMenu(NULL);
     projectModel = new QDirModel(NULL);
+    watcher = NULL;
 }
+
+void ProjectExplorer::AddPathsToWatcher(const QString& root)
+{
+    if (projectModel != NULL)
+        projectModel->refresh();
+
+    QFileInfo info(root);
+
+    if (info.isFile() || !info.exists())
+        return;
+    else
+    {
+        for (QString& entry : FileManager::GetFolderContents(root))
+        {
+            if (QFileInfo(entry).isDir())
+                watcher->addPath(entry);
+        }
+    }
+}
+
 ProjectExplorer::~ProjectExplorer()
 {
     delete projectModel;
@@ -32,6 +53,7 @@ void ProjectExplorer::CloseActiveProject()
 }
 void ProjectExplorer::SetActiveProject(Project *project)
 {
+    delete watcher;
     this->project = project;
 
     if (!FileManager::Exists(project->Root()))
@@ -46,6 +68,10 @@ void ProjectExplorer::SetActiveProject(Project *project)
 
     if (!FileManager::Exists(project->Root() + project->Name() + ".proj"))
         FileManager::CreateFile(project->Root() + project->Name() + ".proj");
+
+    watcher = new QFileSystemWatcher();
+    connect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(AddPathsToWatcher(QString)));
+    watcher->addPath(project->Root() + "src/");
 
     if (this->projectModel != NULL)
     {
@@ -91,7 +117,7 @@ const Project* ProjectExplorer::GetProject() const
 {
     return this->project;
 }
-const QTreeView* ProjectExplorer::GetTree() const
+QTreeView* ProjectExplorer::GetTree()
 {
     return this->projectTree;
 }

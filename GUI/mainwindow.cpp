@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->setMovable(false);
 
     connect(projectExplorer->GetTree(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnProjectExplorerDoubleClicked(QModelIndex)));
+    connect(projectExplorer->GetTree(), SIGNAL(activated(QModelIndex)), this, SLOT(OnProjectExplorerDoubleClicked(QModelIndex)));
+
     connect(projectRunner, SIGNAL(runStarted()), this, SLOT(OnProjectInUse()));
     connect(projectRunner, SIGNAL(runFinished(int)), this, SLOT(OnProjectFinishedUse(int)));
     connect(projectBuilder, SIGNAL(buildStarted()), this, SLOT(OnProjectInUse()));
@@ -55,6 +57,8 @@ void MainWindow::OnProjectExplorerDoubleClicked(QModelIndex index)
     QFileInfo info = this->projectExplorer->FileAt(index);
     if (info.isFile())
         this->editor->OpenFile(info.absoluteFilePath());
+    if (info.isDir())
+        this->projectExplorer->GetTree()->expand(index);
 }
 
 void MainWindow::SetNewProject(Project *project)

@@ -59,17 +59,19 @@ int OpenProjectDialog::exec()
         }
     }
 
-    project = converter->FileToProject(projFilePath);
+    if (fileHasBeenSelected)
+    {
+        project = converter->FileToProject(projFilePath);
 
-    ui->txt_ProjectName->setText(project->Name());
-    ui->txt_ProjectRoot->setText(project->Root());
-    ui->txt_Compiler->setText(project->Compiler());
-    ui->txt_Debugger->setText(project->Debugger());
-    ui->txt_Make->setText(project->MakeUtility());
-    ui->txt_CompilerFlags->setText(project->CompilerFlags());
-    ui->txt_LinkerFlags->setText(project->LinkerFlags());
-
-    if (!fileHasBeenSelected) // no .proj file was selected, therefore it makes no sense to display the dialog
+        ui->txt_ProjectName->setText(project->Name());
+        ui->txt_ProjectRoot->setText(project->Root());
+        ui->txt_Compiler->setText(project->Compiler());
+        ui->txt_Debugger->setText(project->Debugger());
+        ui->txt_Make->setText(project->MakeUtility());
+        ui->txt_CompilerFlags->setText(project->CompilerFlags());
+        ui->txt_LinkerFlags->setText(project->LinkerFlags());
+    }
+    else // no .proj file was selected, therefore it makes no sense to display the dialog
     {
         return QDialog::Rejected;
     }
@@ -146,6 +148,8 @@ void OpenProjectDialog::OnOkButtonClicked()
 
 OpenProjectDialog::~OpenProjectDialog()
 {
+    delete model;
+    delete completer;
     delete ui;
 }
 
