@@ -207,3 +207,13 @@ void MainWindow::OnProjectFinishedUse(int)
     QMenu* projectMenu = ui->menuBar->findChildren<QMenu*>().at(1);
     projectMenu->setEnabled(true);
 }
+
+void MainWindow::on_actionProject_Explorer_toggled(bool arg1)
+{
+    ui->projectTree->setVisible(arg1);
+}
+
+void MainWindow::on_actionOutputWindow_toggled(bool arg1)
+{
+    ui->outputWindow->setVisible(arg1);
+}

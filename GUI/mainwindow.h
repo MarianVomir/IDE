@@ -77,6 +77,10 @@ private slots:
     void OnProjectInUse();
     void OnProjectFinishedUse(int);
 
+    void on_actionProject_Explorer_toggled(bool arg1);
+
+    void on_actionOutputWindow_toggled(bool arg1);
+
 private:
     Ui::MainWindow *ui;
 

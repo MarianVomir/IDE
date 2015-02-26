@@ -71,7 +71,7 @@ void ProjectExplorer::SetActiveProject(Project *project)
 
     watcher = new QFileSystemWatcher();
     connect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(AddPathsToWatcher(QString)));
-    watcher->addPath(project->Root() + "src/");
+    AddPathsToWatcher(project->Root() + "src/");
 
     if (this->projectModel != NULL)
     {
