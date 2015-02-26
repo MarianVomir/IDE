@@ -108,10 +108,11 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
         ss << "\t" << "$(compiler) -Wall -g $(cFlags)" << " -c " << validSourceFileList[i].toStdString() << " -o " << objectFileList[i].toStdString() << "\n";
     }
 
-    ss << ".PHONY: clean rm all" << "\n";
+    ss << ".PHONY: clean rm all find" << "\n";
 
-    ss << "clean:\n\trm -rf  obj/*.o bin/" + project.Name().toStdString();
-
+    //ss << "clean:\n\trm -rf  obj/*.o bin/" + project.Name().toStdString();
+    ss << "clean:\n\tfind obj/ -name '*.o' -type f -delete";
+    ss << "\n\t rm bin/" + project.Name().toStdString();
     return QString(ss.str().c_str());
 }
 
