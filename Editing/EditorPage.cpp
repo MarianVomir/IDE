@@ -64,10 +64,12 @@ void EditorPage::updateLineNumberArea(const QRect& rect, int dy)
     {
         updateLineNumberAreaWidth(0);
     }*/
-    if (dy) {
+    if (dy != 0)
+    {
         lineNumberArea->scroll(0, dy);
-    } else if (m_countCache.first != blockCount()
-               || m_countCache.second != textCursor().block().lineCount()) {
+    }
+    else if (m_countCache.first != blockCount() || m_countCache.second != textCursor().block().lineCount())
+    {
         lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
         m_countCache.first = blockCount();
         m_countCache.second = textCursor().block().lineCount();
@@ -126,19 +128,3 @@ void EditorPage::lineNumberAreaPaintEvent(QPaintEvent *event)
         ++blockNumber;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

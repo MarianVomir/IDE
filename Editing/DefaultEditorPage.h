@@ -4,6 +4,9 @@
 #include "Editing/EditorPage.h"
 #include <QTextEdit>
 
+/**
+This is a simple EditorPage used when no specialized page is available for a given file type/extension.
+**/
 class DefaultEditorPage : public EditorPage
 {
 private:

@@ -159,18 +159,6 @@ QString Editor::GetFileExtension(const QString& filePath)
     return fileExtension;
 }
 
-void Editor::AddTab(const QString& filePath)
-{
-    EditorPage* page = CreateTab(filePath);
-
-    int index = tabWidget->addTab(page, QFileInfo(filePath).fileName());
-    tabWidget->setTabText(index, page->property("fileName").toString());
-    tabWidget->setCurrentIndex(index);
-    page->setFocus();
-
-    watcher->addPath(page->property("filePath").toString());
-}
-
 EditorPage* Editor::CreateTab(const QString& filePath)
 {
     QFileInfo info(filePath);
@@ -252,7 +240,14 @@ void Editor::OpenFile(const QString &filePath)
         }
     }
 
-    AddTab(filePath);
+    EditorPage* page = CreateTab(filePath);
+
+    int index = tabWidget->addTab(page, QFileInfo(filePath).fileName());
+    tabWidget->setTabText(index, page->property("fileName").toString());
+    tabWidget->setCurrentIndex(index);
+    page->setFocus();
+
+    watcher->addPath(page->property("filePath").toString());
 }
 
 bool Editor::SaveFile()
@@ -325,7 +320,7 @@ bool Editor::SaveFileAs()
 
                 delete page;
 
-                return true;
+                page = newPage;
             }
             else
             {
@@ -339,9 +334,11 @@ bool Editor::SaveFileAs()
                 tabWidget->setTabText(tabWidget->currentIndex(), page->property("fileName").toString());
 
                 watcher->addPath(info.absoluteFilePath());
-
-                return true;
             }
+
+            page->setFocus();
+
+            return true;
         }
         catch (FileSystemException& ex)
         {
@@ -368,6 +365,7 @@ void Editor::CloseTab(int index)
 
     if (filePath != "" && saved && onDisk)
     {
+        watcher->removePath(page->property("filePath").toString());
         delete page;
     }
     else if (filePath != "" && !saved)
@@ -387,7 +385,8 @@ void Editor::CloseTab(int index)
             {
                 return;
             }
-             watcher->removePath(page->property("filePath").toString());
+
+            watcher->removePath(page->property("filePath").toString());
             delete page;
         }
         catch (FileSystemException& ex)

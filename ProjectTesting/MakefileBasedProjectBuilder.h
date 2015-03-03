@@ -27,7 +27,6 @@ public:
     virtual int Clean(const Project& proj);
     virtual int Rebuild(const Project& proj);
 
-
 private slots:
     void ProcessStarted();
     void ProcessOutputReady();

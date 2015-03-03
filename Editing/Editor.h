@@ -10,6 +10,7 @@
 #include <QFileSystemWatcher>
 
 #include "FileManager.h"
+
 class Editor : QWidget
 {
     Q_OBJECT
@@ -37,12 +38,31 @@ private:
 
 public slots:
     void NewFile();
-    void OpenFile(const QString& filePath);
-    bool SaveFile();
-    bool SaveFileAs();
-    void CloseTab(int index);
-    void AddTab(const QString& filePath);
+    /**
+    Creates a new tab with default properties and sets focus on it
+    **/
 
+    void OpenFile(const QString& filePath);
+    /**
+    Opens a file in a new tab. If the file is already opened, sets focus on the tab containing that file.
+    **/
+
+    bool SaveFile();
+    /**
+    Saves the current tab's file if it is already on disk. If not on disk, calls SaveFileAs
+    **/
+
+    bool SaveFileAs();
+    /**
+    Prompts to save file with a new name.
+    If the extension has changed, the page is replaced with the corresponding type
+    or the default page (if the extension is not supported).
+    **/
+
+    void CloseTab(int index);
+    /**
+    Closes a tab. Prompts for save if file is changed.
+    **/
 };
 
 #endif // EDITOR_H

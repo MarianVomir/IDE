@@ -27,7 +27,6 @@ NewProjectDialog::NewProjectDialog(QWidget* parent) :
     ui->txt_Make->setCompleter(completer);
     ui->txt_Debugger->setCompleter(completer);
 }
-
 NewProjectDialog::~NewProjectDialog()
 {
     delete ui;
@@ -85,7 +84,6 @@ void NewProjectDialog::OnBrowseCompilerClicked()
         ui->txt_Compiler->setText(compiler);
     }
 }
-
 void NewProjectDialog::OnBrowseDebuggerClicked()
 {
     QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());

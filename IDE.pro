@@ -38,7 +38,7 @@ SOURCES += main.cpp\
     ProjectTesting/ListOutputWriter.cpp \
     ProjectTesting/ProjectBuilder.cpp \
     ProjectTesting/ProjectRunner.cpp \
-    Editing/Utility/BreakpointArea.cpp
+    GUI/settingsdialog.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -69,9 +69,10 @@ HEADERS  += \
     ProjectTesting/OutputWriter.h \
     ProjectTesting/ListOutputWriter.h \
     ProjectTesting/ProjectRunner.h \
-    Editing/Utility/BreakpointArea.h
+    GUI/settingsdialog.h
 
 FORMS    += \
     GUI/mainwindow.ui \
     GUI/newprojectdialog.ui \
-    GUI/openprojectdialog.ui
+    GUI/openprojectdialog.ui \
+    GUI/settingsdialog.ui

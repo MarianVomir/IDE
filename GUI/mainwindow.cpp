@@ -1,26 +1,12 @@
 #include "ui_mainwindow.h"
 #include "mainwindow.h"
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    converter = new JSONConverter();
-    projectExplorer = new ProjectExplorer();
-    projectExplorer->SetTree(ui->projectTree);
-    projectExplorer->SetProjectFileConverter(converter);
-
-    outputWriter = new ListOutputWriter(ui->outputWindow);
-
-    projectBuilder = new MakefileBasedProjectBuilder(outputWriter);
-
-    projectRunner = new ProjectRunner(projectBuilder, outputWriter);
-
-    editor = new Editor(ui->tabEditor);
-
+    statusBar()->hide();
     QList<int> sizes;
     sizes.append(200);
     sizes.append(900);
@@ -33,6 +19,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->mainToolBar->setFloatable(false);
     ui->mainToolBar->setMovable(false);
+
+    converter = new JSONConverter();
+    projectExplorer = new ProjectExplorer();
+    projectExplorer->SetTree(ui->projectTree);
+    projectExplorer->SetProjectFileConverter(converter);
+
+    outputWriter = new ListOutputWriter(ui->outputWindow);
+    projectBuilder = new MakefileBasedProjectBuilder(outputWriter);
+    projectRunner = new ProjectRunner(projectBuilder, outputWriter);
+
+    editor = new Editor(ui->tabEditor);
 
     connect(projectExplorer->GetTree(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnProjectExplorerDoubleClicked(QModelIndex)));
     connect(projectExplorer->GetTree(), SIGNAL(activated(QModelIndex)), this, SLOT(OnProjectExplorerDoubleClicked(QModelIndex)));
@@ -109,7 +106,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     }
     else
     {
-        // if AskSaveAll returns false, it means the user clicked the Cancel button for a tab, therefore we don't close.
+        // if AskSaveAll returns false, it means the user clicked the Cancel button for a tab, therefore we don't close the app yet.
         event->ignore();
     }
 }
