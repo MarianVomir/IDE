@@ -5,6 +5,7 @@
 #include <QTextCharFormat>
 #include <QVector>
 #include <QSyntaxHighlighter>
+#include <QDebug>
 
 #include "CLexic.h"
 

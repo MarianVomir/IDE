@@ -50,10 +50,13 @@ void ProjectExplorer::CloseActiveProject()
 
     this->projectModel = NULL;
     this->project = NULL;
+
+    delete watcher;
+    watcher = NULL;
 }
 void ProjectExplorer::SetActiveProject(Project *project)
 {
-    delete watcher;
+    CloseActiveProject();
     this->project = project;
 
     if (!FileManager::Exists(project->Root()))
@@ -72,12 +75,6 @@ void ProjectExplorer::SetActiveProject(Project *project)
     watcher = new QFileSystemWatcher();
     connect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(AddPathsToWatcher(QString)));
     AddPathsToWatcher(project->Root() + "src/");
-
-    if (this->projectModel != NULL)
-    {
-        delete this->projectModel;
-        this->projectModel = NULL;
-    }
 
     this->projectModel = new ProjectDirModel(NULL, project->Name());
     this->projectModel->setReadOnly(false);
