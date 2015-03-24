@@ -3,6 +3,8 @@
 #include "ProjectManagement/JSONConverter.h"
 #include "Editing/EditorPageFactory.h"
 
+#include "GUI/settingsdialog.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -18,11 +20,12 @@ int main(int argc, char *argv[])
     EditorPageFactory::Creators().insert("h", new CEditorPageCreator()); // C headers (same as .c's)
 
     QApplication a(argc, argv);
-    MainWindow w; 
+/*    MainWindow w;
     w.showMaximized();
-    return a.exec();
+    */
 
- /*
-    Tester_FileManager tFileMan;
-    tFileMan.Test();*/
+    SettingsDialog diag;
+    diag.show();
+
+    return a.exec();
 }
