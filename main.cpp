@@ -20,12 +20,11 @@ int main(int argc, char *argv[])
     EditorPageFactory::Creators().insert("h", new CEditorPageCreator()); // C headers (same as .c's)
 
     QApplication a(argc, argv);
-/*    MainWindow w;
+    MainWindow w;
     w.showMaximized();
-    */
 
-    SettingsDialog diag;
-    diag.show();
+    /*SettingsDialog diag;
+    diag.show();*/
 
     return a.exec();
 }
