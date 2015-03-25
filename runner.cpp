@@ -32,6 +32,8 @@ int main(int argc, char** argv)
 	else status = -1;
 	
 	printf("Process has finished. Exit code %d.\n", status);
+	
+	getchar();
 
 	return 0;
 }

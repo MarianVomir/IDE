@@ -24,7 +24,7 @@ void ProjectRunner::Run(const Project& proj, const QString& commandLineArgs)
     }
 
     outputWriter->WriteLine("Preparing to start: " + proj.Name());
-    QString command = QString("xterm -hold -T ") + proj.Name() + " -e ./runner " + proj.Root() + "bin/" + proj.Name() + " " + commandLineArgs;
+    QString command = QString("xterm -T ") + proj.Name() + " -e ./runner " + proj.Root() + "bin/" + proj.Name() + " " + commandLineArgs;
 
     outputWriter->WriteLine("Starting: " + command);
     process->start(command);
