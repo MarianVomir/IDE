@@ -4,6 +4,7 @@ CEditorPage::CEditorPage()
 {
     highlighter = new CSyntaxHighlighter(this->document());
     completer = new QCompleter(this);
+    parser = new CParser(this);
 
     completer->setWidget(this);
 
@@ -15,12 +16,65 @@ CEditorPage::CEditorPage()
     QStringListModel* l = new QStringListModel(QStringList(Ckeywords.toList()));
 
     completer->setModel(l);
+
+    this->setMouseTracking(true);
 }
 
 CEditorPage::~CEditorPage()
 {
     delete highlighter;
     delete completer;
+    delete parser;
+}
+
+void CEditorPage::mouseMoveEvent(QMouseEvent* e)
+{
+    qDebug() << (this->mapFromParent(e->pos()));
+    QToolTip::showText(this->mapFromParent(e->pos()), "Diag goes here");
+}
+
+void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
+{
+
+    QTextCharFormat errorFormat;
+    errorFormat.setFontWeight(QFont::Bold);
+    errorFormat.setFontUnderline(true);
+    errorFormat.setUnderlineColor(QColor(255, 0, 0));
+
+    QTextCharFormat warningFormat;
+    warningFormat.setFontUnderline(true);
+    warningFormat.setUnderlineColor(QColor(255, 255, 0));
+
+    QTextCharFormat standardFormat;
+    standardFormat.setForeground(QBrush(QColor(0, 0, 0)));
+
+    QTextCursor cursor = this->textCursor();
+    QTextCursor c = this->textCursor();
+
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+
+    this->blockSignals(true);
+    this->setTextCursor(cursor);
+    this->setCurrentCharFormat(standardFormat);
+
+    for (DiagnosticDTO& diag : diags)
+    {
+        cursor.setPosition(diag.offset, QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, diag.length);
+
+        this->setTextCursor(cursor);
+
+        if (diag.severity == CXDiagnostic_Error || diag.severity == CXDiagnostic_Fatal)
+            this->setCurrentCharFormat(errorFormat);
+        if (diag.severity == CXDiagnostic_Warning)
+            this->setCurrentCharFormat(warningFormat);
+    }
+
+    this->setTextCursor(c);
+
+    setUndoRedoEnabled(true);
+    this->blockSignals(false);
 }
 
 void CEditorPage::insertCompletion(QString completion)
@@ -33,10 +87,6 @@ void CEditorPage::insertCompletion(QString completion)
     QTextCursor tc = textCursor();
 
     int remaining = completion.size() - completer->completionPrefix().size();
-/*
-    tc.movePosition(QTextCursor::Left);
-    tc.movePosition(QTextCursor::EndOfWord);
-*/
     tc.insertText(completion.right(remaining));
 
     setTextCursor(tc);
@@ -59,6 +109,9 @@ void CEditorPage::focusInEvent(QFocusEvent *e)
 
 void CEditorPage::keyPressEvent(QKeyEvent *e)
 {
+    QPlainTextEdit::keyPressEvent(e);
+    return;
+
     if (completer != NULL && completer->popup()->isVisible())
     {
         switch(e->key())
@@ -104,17 +157,4 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
     cr.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
 
     completer->complete(cr);
-}
-
-QString CEditorPage::prefixTabs()
-{
-    QString s = "";
-    int pos = textCursor().position();
-    while (pos >= 0 && this->toPlainText()[pos] != '\n') pos--;
-    qDebug() << "Pos of endl: " << pos;
-    pos++;
-    while (this->toPlainText()[pos] == '\t') pos++, s += "\t";
-    qDebug() << "Pos after tabs: " << pos;
-
-    return s;
 }

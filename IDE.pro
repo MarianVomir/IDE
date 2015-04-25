@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = IDE
 TEMPLATE = app
 
+INCLUDEPATH += /usr/lib/llvm-3.4/include/
+LIBS += -L/usr/lib/llvm-3.4/lib -lclang
 CONFIG += c++11
 
 SOURCES += main.cpp\
@@ -38,7 +40,9 @@ SOURCES += main.cpp\
     ProjectTesting/ListOutputWriter.cpp \
     ProjectTesting/ProjectBuilder.cpp \
     ProjectTesting/ProjectRunner.cpp \
-    GUI/settingsdialog.cpp
+    GUI/settingsdialog.cpp \
+    Editing/Core/CParser.cpp \
+    GUI/VisualStyles.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -69,7 +73,10 @@ HEADERS  += \
     ProjectTesting/OutputWriter.h \
     ProjectTesting/ListOutputWriter.h \
     ProjectTesting/ProjectRunner.h \
-    GUI/settingsdialog.h
+    GUI/settingsdialog.h \
+    Editing/Core/CParser.h \
+    Editing/Core/DiagnosticDTO.h \
+    GUI/VisualStyles.h
 
 FORMS    += \
     GUI/mainwindow.ui \

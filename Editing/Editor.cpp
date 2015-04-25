@@ -185,15 +185,15 @@ EditorPage* Editor::CreateTab(const QString& filePath)
     if (page == NULL)
         return NULL;
 
+    page->setPlainText(fileContents);
+
     page->setProperty("filePath", info.absoluteFilePath());
     page->setProperty("fileName", info.fileName());
     page->setProperty("saved", true);
     page->setProperty("onDisk", true);
 
-    page->setPlainText(fileContents);
-
-    connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
-
+    //connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
+    connect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
     return page;
 }
 

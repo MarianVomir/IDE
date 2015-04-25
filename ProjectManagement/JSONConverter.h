@@ -11,6 +11,7 @@
 
 class JSONConverter : public ProjectFileConverter
 {
+
 public:
 
     virtual void ProjectToFile(const Project *proj, const QString &filePath);

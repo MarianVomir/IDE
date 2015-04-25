@@ -55,15 +55,6 @@ void EditorPage::updateLineNumberAreaWidth(int /*newBlockCount*/)
 }
 void EditorPage::updateLineNumberArea(const QRect& rect, int dy)
 {
-    /*if (dy)
-        lineNumberArea->scroll(0, dy);
-    else
-        lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
-
-    if (rect.contains(viewport()->rect()))
-    {
-        updateLineNumberAreaWidth(0);
-    }*/
     if (dy != 0)
     {
         lineNumberArea->scroll(0, dy);

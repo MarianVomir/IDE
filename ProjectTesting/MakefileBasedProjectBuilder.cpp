@@ -110,7 +110,6 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
 
     ss << ".PHONY: clean rm all find" << "\n";
 
-    //ss << "clean:\n\trm -rf  obj/*.o bin/" + project.Name().toStdString();
     ss << "clean:\n\tfind obj/ -name '*.o' -type f -delete";
     ss << "\n\t rm bin/" + project.Name().toStdString();
     return QString(ss.str().c_str());
@@ -121,13 +120,7 @@ MakefileBasedProjectBuilder::MakefileBasedProjectBuilder(OutputWriter* outputWri
 {
     process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
-
-   /* connect(process, SIGNAL(started()), this, SLOT(ProcessStarted()));
-    connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(ProcessOutputReady()));
-    connect(process, SIGNAL(readyReadStandardError()), this, SLOT(ProcessErrorReady()));
-    connect(process, SIGNAL(finished(int)), this, SLOT(ProcessFinished(int)));*/
 }
-
 MakefileBasedProjectBuilder::~MakefileBasedProjectBuilder()
 {
     if (!process->waitForFinished())
@@ -242,15 +235,4 @@ int MakefileBasedProjectBuilder::Rebuild(const Project& proj)
     process->waitForFinished();
     Build(proj);
     return process->exitCode();
-    /*process->setProcessChannelMode(QProcess::MergedChannels);
-    process->setWorkingDirectory(proj.Root());
-
-    process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + " clean ");
-
-    process->waitForFinished();
-
-    process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + proj.Name());*/
-    /*
-    this->Clean(proj);
-    this->Build(proj);*/
 }

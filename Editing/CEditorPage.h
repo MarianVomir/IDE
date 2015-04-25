@@ -8,17 +8,25 @@
 #include <QAbstractItemView>
 #include <QScrollBar>
 #include <QStringListModel>
+#include <QToolTip>
+
+class CEditorPage;
+#include "Editing/Core/CParser.h"
 
 class CEditorPage : public EditorPage
 {
     Q_OBJECT
 
+public slots:
+    void ShowDiagnostics(std::vector<DiagnosticDTO> diags);
+
 private:
     CSyntaxHighlighter* highlighter;
-    // TODO: Parser
+    CParser* parser;
     QCompleter* completer;
-
     QString textUnderCursor() const;
+
+    std::vector<DiagnosticDTO> diags;
 
 public:
     CEditorPage();
@@ -27,8 +35,7 @@ public:
 protected:
     void keyPressEvent(QKeyEvent* e);
     void focusInEvent(QFocusEvent* e);
-
-    QString prefixTabs();
+    void mouseMoveEvent(QMouseEvent* e);
 
 private slots:
     void insertCompletion(QString completion);
