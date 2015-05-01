@@ -29,8 +29,9 @@ CEditorPage::~CEditorPage()
 
 void CEditorPage::mouseMoveEvent(QMouseEvent* e)
 {
-    qDebug() << (this->mapFromParent(e->pos()));
-    QToolTip::showText(this->mapFromParent(e->pos()), "Diag goes here");
+  /*  qDebug() << e->pos();
+    //QToolTip::showText(this->mapToGlobal(e->pos()), "", this);
+    QToolTip::showText(this->mapToGlobal(e->pos()), "Diag goes here", this);*/
 }
 
 void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)

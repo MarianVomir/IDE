@@ -101,7 +101,12 @@ void CParser::Parse()
             CXString message = clang_getDiagnosticSpelling(diag);
             diagDTO.offset = offset;
             diagDTO.severity = clang_getDiagnosticSeverity(diag);
-            diagDTO.length = 1;
+
+            int k = offset;
+            while (text[k] != '\0' && text[k] != '\n' && text[k] != ';')
+                k++;
+
+            diagDTO.length = k - offset;
             diagDTO.message = clang_getCString(message);
             diagDTOList.push_back(diagDTO);
 
