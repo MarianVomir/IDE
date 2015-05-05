@@ -12,30 +12,66 @@ CEditorPage::CEditorPage()
     completer->setCaseSensitivity(Qt::CaseInsensitive);
 
     connect(completer, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(DisplayTooltipForDiagnosticUnderCursor()));
 
-    QStringListModel* l = new QStringListModel(QStringList(Ckeywords.toList()));
-
-    completer->setModel(l);
+    completerModel = new QStringListModel();
+    completer->setModel(completerModel);
 
     this->setMouseTracking(true);
 }
 
 CEditorPage::~CEditorPage()
 {
+    delete completerModel;
     delete highlighter;
     delete completer;
     delete parser;
 }
 
+void CEditorPage::DisplayTooltip(const QTextCursor& cursor, const QPoint& point)
+{
+    bool messageShown = false;
+    if (!cursor.isNull())
+    {
+        int pos = cursor.position();
+        for (DiagnosticDTO& diag : this->diags)
+        {
+            int diagStart = diag.offset;
+            int diagEnd = diagStart + diag.length;
+
+            if (pos >= diagStart && pos <= diagEnd)
+            {
+                QToolTip::showText(point, diag.message, this);
+                messageShown = true;
+            }
+        }
+    }
+
+    if (!messageShown)
+    {
+        QToolTip::showText(point, "", this);
+    }
+}
+
+void CEditorPage::DisplayTooltipForDiagnosticUnderCursor()
+{
+    QTextCursor cursor = this->textCursor();
+    DisplayTooltip(cursor, this->viewport()->mapToGlobal(this->cursorRect().topLeft()));
+}
+
 void CEditorPage::mouseMoveEvent(QMouseEvent* e)
 {
-  /*  qDebug() << e->pos();
-    //QToolTip::showText(this->mapToGlobal(e->pos()), "", this);
-    QToolTip::showText(this->mapToGlobal(e->pos()), "Diag goes here", this);*/
+    QTextCursor cursor = cursorForPosition(e->pos());
+    DisplayTooltip(cursor, this->mapToGlobal(e->pos()));
+
+    QPlainTextEdit::mouseMoveEvent(e);
 }
 
 void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
 {
+    this->blockSignals(true);
+
+    this->diags = diags;
 
     QTextCharFormat errorFormat;
     errorFormat.setFontWeight(QFont::Bold);
@@ -49,33 +85,40 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
     QTextCharFormat standardFormat;
     standardFormat.setForeground(QBrush(QColor(0, 0, 0)));
 
-    QTextCursor cursor = this->textCursor();
-    QTextCursor c = this->textCursor();
 
+    QTextCursor c = this->textCursor();
+    QTextCursor cursor = this->textCursor();
+
+   // cursor.beginEditBlock();
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
-
-    this->blockSignals(true);
+    cursor.setCharFormat(standardFormat);
+   // cursor.endEditBlock();
     this->setTextCursor(cursor);
-    this->setCurrentCharFormat(standardFormat);
-
     for (DiagnosticDTO& diag : diags)
     {
+        cursor = this->textCursor();
+
+      //  cursor.beginEditBlock();
         cursor.setPosition(diag.offset, QTextCursor::MoveAnchor);
         cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, diag.length);
-
-        this->setTextCursor(cursor);
-
         if (diag.severity == CXDiagnostic_Error || diag.severity == CXDiagnostic_Fatal)
-            this->setCurrentCharFormat(errorFormat);
+            cursor.setCharFormat(errorFormat);
         if (diag.severity == CXDiagnostic_Warning)
-            this->setCurrentCharFormat(warningFormat);
+            cursor.setCharFormat(warningFormat);
+    //    cursor.endEditBlock();
+        this->setTextCursor(cursor);
     }
-
     this->setTextCursor(c);
 
-    setUndoRedoEnabled(true);
     this->blockSignals(false);
+}
+
+void CEditorPage::SetCompletionModel(QStringList l)
+{
+    QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
+
+    completerModel->setStringList(l);
 }
 
 void CEditorPage::insertCompletion(QString completion)
@@ -110,8 +153,8 @@ void CEditorPage::focusInEvent(QFocusEvent *e)
 
 void CEditorPage::keyPressEvent(QKeyEvent *e)
 {
-    QPlainTextEdit::keyPressEvent(e);
-    return;
+   /* QPlainTextEdit::keyPressEvent(e);
+    return;*/
 
     if (completer != NULL && completer->popup()->isVisible())
     {
@@ -129,6 +172,8 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
         }
     }
 
+    QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
+
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space);
     if (completer == NULL || !isShortcut)
     {
@@ -139,20 +184,22 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
          return;
 
      static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+     //static QString eow("~!@#$%^&*()_+{}|:\"<>?,/;'[]\\-="); // end of word
+
      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
      QString completionPrefix = textUnderCursor();
 
-     if (!isShortcut && (hasModifier || e->text().isEmpty() || eow.contains(e->text().right(1)) || completionPrefix.length() < 1))
-     {
-         completer->popup()->hide();
-         return;
-     }
+    if (!isShortcut && (hasModifier || e->text().isEmpty() || eow.contains(e->text().right(1)) || completionPrefix.length() < 1))
+    {
+        completer->popup()->hide();
+        return;
+    }
 
-     if (completionPrefix != completer->completionPrefix()) {
-         completer->setCompletionPrefix(completionPrefix);
-         completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
-     }
-
+    if (completionPrefix != completer->completionPrefix())
+    {
+        completer->setCompletionPrefix(completionPrefix);
+        completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+    }
 
     QRect cr = cursorRect();
     cr.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());

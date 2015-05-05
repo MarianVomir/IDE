@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    statusBar()->hide();
+   // statusBar()->hide();
     QList<int> sizes;
     sizes.append(200);
     sizes.append(900);
