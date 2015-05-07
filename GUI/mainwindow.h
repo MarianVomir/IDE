@@ -29,6 +29,7 @@
 
 #include "newprojectdialog.h"
 #include "openprojectdialog.h"
+#include "settingsdialog.h"
 
 namespace Ui {
     class MainWindow;
@@ -80,6 +81,8 @@ private slots:
     void on_actionProject_Explorer_toggled(bool arg1);
 
     void on_actionOutputWindow_toggled(bool arg1);
+
+    void on_actionOpen_Settings_triggered();
 
 private:
     Ui::MainWindow *ui;

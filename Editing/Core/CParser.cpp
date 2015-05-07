@@ -19,59 +19,12 @@ void CParser::ActivateTimer()
 {
     if (this->timer->isActive())
         return;
-    this->timer->start(500);
+    this->timer->start(PARSING_INTERVAL);
 }
-
-/*
- * NOT USED, this code will be removed in the future
- *
-CXChildVisitResult visit(CXCursor cursor, CXCursor parent, CXClientData clientData)
-{
-    CXSourceRange range = clang_getCursorExtent(cursor);
-    CXSourceLocation loc1 = clang_getRangeStart(range);
-    CXSourceLocation loc2 = clang_getRangeEnd(range);
-
-   // CXSourceLocation loc = clang_getCursorLocation(cursor);
-    unsigned int offset1;
-    unsigned int line1;
-    unsigned int col1;
-    unsigned int offset2;
-    unsigned int line2;
-    unsigned int col2;
-    clang_getFileLocation(loc1, NULL, &line1, &col1, &offset1);
-    clang_getFileLocation(loc2, NULL, &line2, &col2, &offset2);
-
-    CXCursorKind cursorKind = clang_getCursorKind(cursor);
-
-    if (
-            cursorKind == CXCursor_VarDecl ||
-            cursorKind == CXCursor_FunctionDecl ||
-            cursorKind == CXCursor_StructDecl ||
-            cursorKind == CXCursor_EnumDecl ||
-            cursorKind == CXCursor_FieldDecl
-            )
-    {
-        CXCompletionString completionString = clang_getCursorCompletionString(cursor);
-
-        for (int j = 0; j < clang_getNumCompletionChunks(completionString); j++)
-        {
-            CXCompletionChunkKind k = clang_getCompletionChunkKind(completionString, j);
-            CXString clangstr = clang_getCompletionChunkText(completionString, j);
-            const char* cstr = clang_getCString(clangstr);
-            std::cout << cstr << " ";
-            clang_disposeString(clangstr);
-        }
-        std::cout << std::endl;
-        return CXChildVisit_Recurse;
-    }
-
-    return CXChildVisit_Recurse;
-}
-*/
 
 void CParser::Parse()
 {
-    static const char* args[] = { "-c", "-x", "c", "-Weverything", "-fsyntax-only" };
+    static const char* args[] = { "-c", "-x", "c", "-Wall", "-fsyntax-only" };
     static int numArgs = 5;
 
     QByteArray b = textEdit->toPlainText().toLocal8Bit();
@@ -163,8 +116,6 @@ void CParser::Parse()
 
             clang_disposeString(message);
         }
-
-        clang_disposeDiagnostic(diag);
     }
 
     emit DiagnosticsReady(diagDTOList);
@@ -177,24 +128,7 @@ void CParser::Parse()
 
     if (line != 0 && col != 0)
     {
-        // qDebug() << "LINE " << line << " COL " << col;
         auto completions = clang_codeCompleteAt(translationUnit, fileName, line, col, unsavedFiles, 1, clang_defaultCodeCompleteOptions());
-/*
-        for (i = 0; i < results->NumResults; i++)
-        {
-            CXCompletionResult result = results->Results[i];
-            CXCompletionString str = result.CompletionString;
-
-            for (int j = 0; j < clang_getNumCompletionChunks(str); j++)
-            {
-                CXCompletionChunkKind k = clang_getCompletionChunkKind(str, j);
-                const char* cstr = clang_getCString(clang_getCompletionChunkText(str, j));
-
-                if (k == CXCompletionChunk_TypedText)
-                ui->txt_Debug->appendPlainText(QString("From ") + std::to_string(i).c_str() + " Kind " +  std::to_string(k).c_str() + " " + QString(cstr));
-            }
-        }
-*/
 
         for (auto i = 0u; i < completions->NumResults; ++i)
         {
@@ -204,59 +138,40 @@ void CParser::Parse()
             {
                 auto chunkType = clang_getCompletionChunkKind(completionString, j);
 
-                if (
-                        (text[c.position() - 1] == '.')
-                        ||
-                        (text[c.position()] - 2 == '-' && text[c.position() - 1 == '>'])
-                   )    // . or -> used => most likely a member access
+                if (chunkType == CXCompletionChunk_TypedText)
                 {
-                    if (chunkType == CXCompletionChunk_TypedText) // this is to get the members' names, not their types too
-                    {
-                        auto chunkString = clang_getCompletionChunkText(completionString, j);
-                        const char* completionItem = clang_getCString(chunkString);
+                    auto chunkString = clang_getCompletionChunkText(completionString, j);
+                    const char* completionItem = clang_getCString(chunkString);
 
-                        this->AddToCompletionList(completionItem);
+                    this->AddToCompletionList(completionItem);
 
-                        qDebug() << completionItem << " ";
-                        clang_disposeString(chunkString);
-                    }
+                    //qDebug() << completionItem << " ";
+
+                    clang_disposeString(chunkString);
                 }
-
-                else
-                {
-                    if (chunkType == CXCompletionChunk_TypedText)
-                    {
-                        auto chunkString = clang_getCompletionChunkText(completionString, j);
-                        const char* completionItem = clang_getCString(chunkString);
-
-                        this->AddToCompletionList(completionItem);
-
-                        qDebug() << completionItem << " ";
-                        clang_disposeString(chunkString);
-                    }
-                }
-
             }
         }
 
         clang_disposeCodeCompleteResults(completions);
     }
 
-    qDebug() << "\n\n\n\n";
+    //qDebug() << "\n\n\n\n";
     delete unsavedFiles;
 
     emit CompletionSuggestionsReady(this->completionList);
 
-    // clang_disposeDiagnosticSet(diagnosticSet);
+    clang_disposeDiagnosticSet(diagnosticSet);
 }
 
 void CParser::AddToCompletionList(const char *completionItem)
 {
-    if (strcmp("", completionItem) == 0)
+    QString s(completionItem);
+    s = s.trimmed();
+    if (s == "")
         return;
 
-    this->completionList.append(QString(completionItem));
-    qDebug() << "Appended " << completionItem << " to model.";
+    this->completionList.append(s);
+    //qDebug() << "Appended " << completionItem << " to model.";
 }
 void CParser::ClearCompletionList()
 {

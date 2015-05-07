@@ -8,8 +8,10 @@ CEditorPage::CEditorPage()
 
     completer->setWidget(this);
 
+  //  QCompleter::
+    completer->setModelSorting(QCompleter::UnsortedModel);
     completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
+   // completer->setCaseSensitivity(Qt::CaseInsensitive);
 
     connect(completer, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(DisplayTooltipForDiagnosticUnderCursor()));
@@ -18,6 +20,13 @@ CEditorPage::CEditorPage()
     completer->setModel(completerModel);
 
     this->setMouseTracking(true);
+
+    errorFormat.setFontWeight(QFont::Bold);
+    errorFormat.setFontUnderline(true);
+    errorFormat.setUnderlineColor(QColor(255, 0, 0));
+    standardFormat.setForeground(QBrush(QColor(0, 0, 0)));
+    warningFormat.setFontUnderline(true);
+    warningFormat.setUnderlineColor(QColor(255, 255, 0));
 }
 
 CEditorPage::~CEditorPage()
@@ -70,20 +79,16 @@ void CEditorPage::mouseMoveEvent(QMouseEvent* e)
 void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
 {
     this->blockSignals(true);
+    // stop this text page from emitting any signals
+    // what we are interested in is to not emit textChanged() when setting the text format
+
+    int verticalScrollBarValue = this->verticalScrollBar()->value();
+    // get the current value of the vertical scrollbar
+    // we need this because the text page autoscrolls where the text was last changed
 
     this->diags = diags;
+    // keep the new diagnostics
 
-    QTextCharFormat errorFormat;
-    errorFormat.setFontWeight(QFont::Bold);
-    errorFormat.setFontUnderline(true);
-    errorFormat.setUnderlineColor(QColor(255, 0, 0));
-
-    QTextCharFormat warningFormat;
-    warningFormat.setFontUnderline(true);
-    warningFormat.setUnderlineColor(QColor(255, 255, 0));
-
-    QTextCharFormat standardFormat;
-    standardFormat.setForeground(QBrush(QColor(0, 0, 0)));
 
 
     QTextCursor c = this->textCursor();
@@ -111,6 +116,7 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
     }
     this->setTextCursor(c);
 
+    this->verticalScrollBar()->setValue(verticalScrollBarValue);
     this->blockSignals(false);
 }
 
@@ -119,6 +125,9 @@ void CEditorPage::SetCompletionModel(QStringList l)
     QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
 
     completerModel->setStringList(l);
+   /* completer->model()->set
+    completer->popup()->selectionModel()->select(completer->completionModel()->index(0,0), QItemSelectionModel::Select
+       );*/
 }
 
 void CEditorPage::insertCompletion(QString completion)
@@ -131,6 +140,11 @@ void CEditorPage::insertCompletion(QString completion)
     QTextCursor tc = textCursor();
 
     int remaining = completion.size() - completer->completionPrefix().size();
+
+    /*QString prefix = completer->completionPrefix();
+    while (completion[i] == prefix[i])
+        tc.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+*/
     tc.insertText(completion.right(remaining));
 
     setTextCursor(tc);
@@ -174,22 +188,26 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
 
     QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
 
+    bool completerCalled = (e->key() == Qt::Key_Space && (e->modifiers() & Qt::ControlModifier)); // ctrl-space pressed
+
+
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space);
-    if (completer == NULL || !isShortcut)
+    if (completer == NULL || ! completerCalled) /* || !isShortcut)*/
     {
         QPlainTextEdit::keyPressEvent(e);
+        return;
     }
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     if (completer == NULL || (ctrlOrShift && e->text().isEmpty()))
          return;
 
-     static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+     static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-=\n\t "); // end of word
      //static QString eow("~!@#$%^&*()_+{}|:\"<>?,/;'[]\\-="); // end of word
 
      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
      QString completionPrefix = textUnderCursor();
 
-    if (!isShortcut && (hasModifier || e->text().isEmpty() || eow.contains(e->text().right(1)) || completionPrefix.length() < 1))
+    if (/*!isShortcut && (hasModifier || */e->text().isEmpty() /*|| eow.contains(e->text().right(1))*/ || completionPrefix.length() < 1)
     {
         completer->popup()->hide();
         return;

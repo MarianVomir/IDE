@@ -171,14 +171,7 @@ EditorPage* Editor::CreateTab(const QString& filePath)
         fileName = info.fileName();
         fileExtension = this->GetFileExtension(filePath);
 
-        try
-        {
-            fileContents = FileManager::ReadFile(filePath);
-        }
-        catch (FileSystemException& ex)
-        {
-            QMessageBox::warning(NULL, "Cannot read file", ex.Message());
-        }
+        fileContents = FileManager::ReadFile(filePath);
     }
 
     EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension);
@@ -379,7 +372,10 @@ void Editor::CloseTab(int index)
             int answer = box.exec();
             if (answer == QMessageBox::Save)
             {
-                SaveFile();
+                if (SaveFile() == false)
+                {
+                    return;
+                }
             }
             else if (answer == QMessageBox::Cancel)
             {

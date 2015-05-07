@@ -16,7 +16,7 @@ QVariant ProjectDirModel::headerData(int section, Qt::Orientation orientation, i
     }
     if (section == 0)
     {
-        return QString("Project: "  + projectName);
+        return QString("Current Project: "  + projectName);
     }
     else return QString("");
 }

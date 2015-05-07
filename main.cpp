@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
     EditorPageFactory::Creators().insert("c", new CEditorPageCreator()); // C language (.c's)
     EditorPageFactory::Creators().insert("h", new CEditorPageCreator()); // C headers (same as .c's)
 
-
     QApplication a(argc, argv);
     MainWindow w;
     w.showMaximized();

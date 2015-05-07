@@ -43,6 +43,7 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
             }
         }
     }
+    QMap<QString, QStringList> headerDependencies;
 
     for (QString fileName : sourceFiles)
     {
@@ -57,6 +58,8 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
                 }
                 else
                 {
+                    QStringList headers = GetUserIncludedHeaders(fileName);
+
                     fileName.replace(0, projectRoot.size(), "");
                     objectFile = fileName;
                     objectFile.replace(0, QString("src/").size(), "obj/");
@@ -64,6 +67,8 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
 
                     objectFileList << objectFile;
                     validSourceFileList << fileName;
+
+                    headerDependencies[fileName] = headers;
                 }
             }
         }
@@ -94,17 +99,24 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
         ss << objectFile.toStdString() << " ";
     }
     ss << "\n";
-    ss << "\t" << "$(compiler) $(lFlags)" << " -o " << (QString("bin/") + project.Name()).toStdString() << " ";
+    ss << "\t" << "$(compiler) " << "-o " << (QString("bin/") + project.Name()).toStdString() << " ";
 
     for (QString objectFile : objectFileList)
     {
         ss << objectFile.toStdString() << " ";
     }
-    ss << "\n";
+    ss << "$(lFlags)\n";
 
     for (int i = 0; i < objectFileList.size(); i++)
     {
-        ss << objectFileList[i].toStdString() << " : " << validSourceFileList[i].toStdString() << "\n";
+        ss << objectFileList[i].toStdString() << " : " << validSourceFileList[i].toStdString() << " ";
+
+/*
+        for (auto header : headerDependencies[validSourceFileList[i]])
+            ss << header.toStdString() << " ";
+*/
+
+        ss << "\n";
         ss << "\t" << "$(compiler) -Wall -g $(cFlags)" << " -c " << validSourceFileList[i].toStdString() << " -o " << objectFileList[i].toStdString() << "\n";
     }
 
@@ -113,6 +125,43 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
     ss << "clean:\n\tfind obj/ -name '*.o' -type f -delete";
     ss << "\n\t rm bin/" + project.Name().toStdString();
     return QString(ss.str().c_str());
+}
+
+// Not used right now
+QStringList MakefileBasedProjectBuilder::GetUserIncludedHeaders(const QString &cFile)
+{
+    QStringList headers;
+    static QRegExp userDefHeaderRegex("#include +\"(.+)\"");
+    userDefHeaderRegex.setMinimal(true);
+
+    try
+    {
+        QString text = FileManager::ReadFile(cFile);
+
+        int index = 0;
+        int offset = 0;
+
+        while (index != -1)
+        {
+            index = userDefHeaderRegex.indexIn(text, offset, QRegExp::CaretAtOffset);
+            if (index == -1)
+                break;
+
+            QString header = userDefHeaderRegex.cap(1);
+
+            header = QDir(QFileInfo(cFile).absolutePath()).relativeFilePath(header);
+
+            headers.append(header);
+            offset += userDefHeaderRegex.matchedLength();
+        }
+
+    }
+    catch (FileSystemException& e)
+    {
+        qDebug() << QString("Cannot read file to determine header dependencies: ") << e.Message();
+    }
+
+    return headers;
 }
 
 MakefileBasedProjectBuilder::MakefileBasedProjectBuilder(OutputWriter* outputWriter)

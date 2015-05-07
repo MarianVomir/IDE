@@ -1,13 +1,13 @@
 #ifndef JSONCONVERTER_H
 #define JSONCONVERTER_H
 
-#include "ProjectManagement/ProjectFileConverter.h"
-#include "Exceptions.h"
-#include "FileManager.h"
-
 #include <QFile>
 #include <QJsonObject>
 #include <QJsonDocument>
+
+#include "ProjectManagement/ProjectFileConverter.h"
+#include "Exceptions.h"
+#include "FileManager.h"
 
 class JSONConverter : public ProjectFileConverter
 {

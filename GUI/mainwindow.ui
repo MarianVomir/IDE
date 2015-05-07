@@ -182,9 +182,16 @@
     <addaction name="actionProject_Explorer"/>
     <addaction name="actionOutputWindow"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionOpen_Settings"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProject"/>
    <addaction name="menuView"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -194,7 +201,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
   </widget>
@@ -329,6 +336,11 @@
    </property>
    <property name="shortcut">
     <string>Alt+2</string>
+   </property>
+  </action>
+  <action name="actionOpen_Settings">
+   <property name="text">
+    <string>Open Settings</string>
    </property>
   </action>
  </widget>

@@ -1,14 +1,15 @@
 #ifndef MAKEFILEBASEDPROJECTBUILDER_H
 #define MAKEFILEBASEDPROJECTBUILDER_H
 
+#include <sstream>
+
+#include <QDebug>
+#include <QProcess>
+
 #include "ProjectTesting/ProjectBuilder.h"
 #include "OutputWriter.h"
 #include "Exceptions.h"
 #include "FileManager.h"
-
-#include <sstream>
-
-#include <QProcess>
 
 class MakefileBasedProjectBuilder : public ProjectBuilder
 {
@@ -16,8 +17,6 @@ class MakefileBasedProjectBuilder : public ProjectBuilder
 
 private:
     QProcess* process;
-
-    QString BuildMakefile(const Project& proj);
 
 public:
     MakefileBasedProjectBuilder(OutputWriter* outputWriter);
@@ -32,6 +31,10 @@ private slots:
     void ProcessOutputReady();
     void ProcessErrorReady();
     void ProcessFinished(int errCode);
+
+private:
+    QString BuildMakefile(const Project& proj);
+    QStringList GetUserIncludedHeaders(const QString& cFile);
 };
 
 #endif // MAKEFILEBASEDPROJECTBUILDER_H

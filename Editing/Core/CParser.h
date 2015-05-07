@@ -14,6 +14,8 @@ class CParser : QObject
 {
     Q_OBJECT
 
+#define PARSING_INTERVAL 500 // milliseconds
+
 signals:
     void DiagnosticsReady(std::vector<DiagnosticDTO>);
     void CompletionSuggestionsReady(QStringList);

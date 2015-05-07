@@ -11,11 +11,6 @@ void JSONConverter::ProjectToFile(const Project *proj, const QString &filePath)
     projObject["linkerFlags"] = proj->LinkerFlags();
 
     QJsonDocument jsonDoc(projObject);
-    /*
-    QFile projFile(filePath);
-    projFile.write(jsonDoc.toJson());
-    projFile.close();
-    */
     FileManager::WriteFile(filePath, QString(jsonDoc.toJson()));
 }
 
@@ -30,10 +25,10 @@ Project *JSONConverter::FileToProject(const QString &filePath)
     {
         throw Exception("Cannot read project information from project file! Is the file locked?");
     }
+    projFile.close();
 
     QString fileContents = FileManager::ReadFile(filePath);
 
-    projFile.close();
     QJsonDocument doc(QJsonDocument::fromJson(fileContents.toLocal8Bit()));
     QJsonObject projObject = doc.object();
 

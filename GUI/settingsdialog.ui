@@ -19,11 +19,11 @@
      <x>0</x>
      <y>0</y>
      <width>561</width>
-     <height>421</height>
+     <height>351</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -284,14 +284,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="txt_Compiler_2">
+       <widget class="QLineEdit" name="txt_Compiler_Default">
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QPushButton" name="btn_BrowseCompiler_2">
+       <widget class="QPushButton" name="btn_BrowseCompiler_Default">
         <property name="maximumSize">
          <size>
           <width>30</width>
@@ -323,7 +323,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="txt_Debugger_2">
+       <widget class="QLineEdit" name="txt_Debugger_Default">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -336,7 +336,7 @@
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QPushButton" name="btn_BrowseDebugger_2">
+       <widget class="QPushButton" name="btn_BrowseDebugger_Default">
         <property name="maximumSize">
          <size>
           <width>30</width>
@@ -368,14 +368,14 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="txt_Make_2">
+       <widget class="QLineEdit" name="txt_Make_Default">
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QPushButton" name="btn_BrowseMake_2">
+       <widget class="QPushButton" name="btn_BrowseMake_Default">
         <property name="maximumSize">
          <size>
           <width>30</width>
@@ -422,7 +422,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="txt_CompilerFlags_2">
+       <widget class="QLineEdit" name="txt_CompilerFlags_Default">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Arguments to be used when compiling individual files.&lt;/p&gt;&lt;p&gt;E.g. -m64 to compile for 64bit platforms.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -451,7 +451,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="txt_LinkerFlags_2">
+       <widget class="QLineEdit" name="txt_LinkerFlags_Default">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Arguments to be used when linking, such as -l to link to an external library.&lt;/p&gt;&lt;p&gt;E.g. -lpthread to link to POSIX threads library.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -490,7 +490,52 @@
     </widget>
    </widget>
   </widget>
+  <widget class="QPushButton" name="btn_OK">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>360</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_Cancel">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>360</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>txt_Compiler</tabstop>
+  <tabstop>btn_BrowseCompiler</tabstop>
+  <tabstop>txt_Debugger</tabstop>
+  <tabstop>btn_BrowseDebugger</tabstop>
+  <tabstop>txt_Make</tabstop>
+  <tabstop>btn_BrowseMake</tabstop>
+  <tabstop>txt_CompilerFlags</tabstop>
+  <tabstop>txt_LinkerFlags</tabstop>
+  <tabstop>txt_Compiler_Default</tabstop>
+  <tabstop>btn_BrowseCompiler_Default</tabstop>
+  <tabstop>txt_Debugger_Default</tabstop>
+  <tabstop>btn_BrowseDebugger_Default</tabstop>
+  <tabstop>txt_Make_Default</tabstop>
+  <tabstop>btn_BrowseMake_Default</tabstop>
+  <tabstop>txt_CompilerFlags_Default</tabstop>
+  <tabstop>txt_LinkerFlags_Default</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

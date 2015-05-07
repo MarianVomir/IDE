@@ -27,55 +27,62 @@ OpenProjectDialog::OpenProjectDialog(QWidget *parent, ProjectFileConverter* conv
 }
 int OpenProjectDialog::exec()
 {
-    QFileDialog filePicker;
-    filePicker.setFileMode(QFileDialog::AnyFile);
-    filePicker.setNameFilter(QString("Project files (*.proj)"));
-    filePicker.setDirectory(QDir::homePath());
-
-    bool fileHasBeenSelected = false;
-    while (1)
+    try
     {
-        projFilePath = filePicker.getOpenFileName(NULL, "Select Project File", "", "Project files (*.proj)");
-        if (projFilePath.size() > 0)
+        QFileDialog filePicker;
+        filePicker.setFileMode(QFileDialog::AnyFile);
+        filePicker.setNameFilter(QString("Project files (*.proj)"));
+        filePicker.setDirectory(QDir::homePath());
+
+        bool fileHasBeenSelected = false;
+        while (1)
         {
-            QFileInfo info(projFilePath);
-            if (!info.fileName().endsWith(".proj")) // file name does not end with .proj
+            projFilePath = filePicker.getOpenFileName(NULL, "Select Project File", "", "Project files (*.proj)");
+            if (projFilePath.size() > 0)
             {
-                QMessageBox::warning(
-                            NULL,
-                            "Not a valid file",
-                            "Project file must have '.proj' extension"
-                        );
+                QFileInfo info(projFilePath);
+                if (!info.fileName().endsWith(".proj")) // file name does not end with .proj
+                {
+                    QMessageBox::warning(
+                                NULL,
+                                "Not a valid file",
+                                "Project file must have '.proj' extension"
+                            );
+                }
+                else
+                {
+                    fileHasBeenSelected = true;
+                    break;
+                }
             }
             else
             {
-                fileHasBeenSelected = true;
                 break;
             }
         }
-        else
+
+        if (fileHasBeenSelected)
         {
-            break;
+            project = converter->FileToProject(projFilePath);
+
+            ui->txt_ProjectName->setText(project->Name());
+            ui->txt_ProjectRoot->setText(project->Root());
+            ui->txt_Compiler->setText(project->Compiler());
+            ui->txt_Debugger->setText(project->Debugger());
+            ui->txt_Make->setText(project->MakeUtility());
+            ui->txt_CompilerFlags->setText(project->CompilerFlags());
+            ui->txt_LinkerFlags->setText(project->LinkerFlags());
+        }
+        else // no .proj file was selected, therefore it makes no sense to display the dialog
+        {
+            return QDialog::Rejected;
         }
     }
-
-    if (fileHasBeenSelected)
+    catch (Exception& e)
     {
-        project = converter->FileToProject(projFilePath);
-
-        ui->txt_ProjectName->setText(project->Name());
-        ui->txt_ProjectRoot->setText(project->Root());
-        ui->txt_Compiler->setText(project->Compiler());
-        ui->txt_Debugger->setText(project->Debugger());
-        ui->txt_Make->setText(project->MakeUtility());
-        ui->txt_CompilerFlags->setText(project->CompilerFlags());
-        ui->txt_LinkerFlags->setText(project->LinkerFlags());
-    }
-    else // no .proj file was selected, therefore it makes no sense to display the dialog
-    {
+        QMessageBox::warning(NULL, "Cannot read project file", e.Message());
         return QDialog::Rejected;
     }
-
     return QDialog::exec(); // call the standard exec to display the dialog and return Accepted or Rejected based on what QDialog::exec() returns
 }
 
@@ -137,8 +144,11 @@ void OpenProjectDialog::OnOkButtonClicked()
     MainWindow* mw = static_cast<MainWindow*>(this->parent());
     try
     {
-        mw->SetOpenProject(project);
-        this->accept();
+        if (project != NULL)
+        {
+            mw->SetOpenProject(project);
+            this->accept();
+        }
     }
     catch (Exception& e)
     {

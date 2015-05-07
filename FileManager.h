@@ -12,6 +12,7 @@
 
 #include "Exceptions.h"
 
+/** <<static>> **/
 class FileManager
 {
 private:

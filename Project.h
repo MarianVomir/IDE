@@ -26,6 +26,11 @@ public:
     const QString& CompilerFlags() const { return compilerFlags; }
     const QString& LinkerFlags() const { return linkerFlags; }
     const QString& MakeUtility() const { return makeUtility; }
+    void SetCompiler(const QString& compiler) { this->compiler = compiler; }
+    void SetDebugger(const QString& debugger) { this->debugger = debugger; }
+    void SetCompilerFlags(const QString& cflags) { this->compilerFlags = cflags; }
+    void SetLinkerFlags(const QString& lflags) { this->linkerFlags = lflags; }
+    void SetMakeUtility(const QString& makeUtility) { this->makeUtility = makeUtility; }
 
     explicit Project
     (

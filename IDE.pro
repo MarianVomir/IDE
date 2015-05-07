@@ -42,7 +42,9 @@ SOURCES += main.cpp\
     ProjectTesting/ProjectRunner.cpp \
     GUI/settingsdialog.cpp \
     Editing/Core/CParser.cpp \
-    GUI/VisualStyles.cpp
+    GUI/VisualStyles.cpp \
+    Global.cpp \
+    Settings/SettingsManager.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -76,7 +78,9 @@ HEADERS  += \
     GUI/settingsdialog.h \
     Editing/Core/CParser.h \
     Editing/Core/DiagnosticDTO.h \
-    GUI/VisualStyles.h
+    GUI/VisualStyles.h \
+    Global.h \
+    Settings/SettingsManager.h
 
 FORMS    += \
     GUI/mainwindow.ui \

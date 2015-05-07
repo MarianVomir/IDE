@@ -141,7 +141,14 @@ void MainWindow::on_actionOpen_File_triggered()
     QStringList files = QFileDialog::getOpenFileNames(this, "Open File(s)", QDir::homePath());
     for (int i = 0; i < files.size(); i++)
     {
-        this->editor->OpenFile(files[i]);
+        try
+        {
+            this->editor->OpenFile(files[i]);
+        }
+        catch (FileSystemException& ex)
+        {
+            QMessageBox::warning(NULL, "Cannot read file", ex.Message());
+        }
     }
 }
 void MainWindow::on_actionSave_File_triggered()
@@ -213,4 +220,11 @@ void MainWindow::on_actionProject_Explorer_toggled(bool arg1)
 void MainWindow::on_actionOutputWindow_toggled(bool arg1)
 {
     ui->outputWindow->setVisible(arg1);
+}
+
+void MainWindow::on_actionOpen_Settings_triggered()
+{
+    SettingsDialog settingsDialog(this);
+    settingsDialog.setModal(true);
+    settingsDialog.exec();
 }

@@ -5,7 +5,7 @@
 
 #include <QString>
 
-// << interface >>
+/** << interface >> **/
 class ProjectFileConverter
 {
 public:

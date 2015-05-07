@@ -1,11 +1,6 @@
 #ifndef PROJECTEXPLORER_H
 #define PROJECTEXPLORER_H
 
-#include "Project.h"
-#include "ProjectManagement/ProjectDirModel.h"
-#include "FileManager.h"
-#include "ProjectManagement/ProjectFileConverter.h"
-
 #include <QTreeView>
 #include <QDirModel>
 #include <QMessageBox>
@@ -13,19 +8,28 @@
 #include <QMenu>
 #include <QPoint>
 #include <QFileSystemWatcher>
-
 #include <QQueue>
+#include <QMutex>
+
+#include "Project.h"
+#include "ProjectManagement/ProjectDirModel.h"
+#include "FileManager.h"
+#include "ProjectManagement/ProjectFileConverter.h"
+#include "Global.h"
 
 class ProjectExplorer : public QObject
 {
     Q_OBJECT
 
 private:
+    QMutex mtx;
+
     const static QString newFolderBaseName;
     const static QString newFileBaseName;
 
-    Project* project;
-    QMenu* rightClickMenu;
+    QMenu* rootRightClickMenu;
+    QMenu* fileRightClickMenu;
+    QMenu* folderRightClickMenu;
 
     QTreeView* projectTree;
     QDirModel* projectModel;
@@ -35,7 +39,6 @@ private:
 
 private slots:
     void OnProjectTreeRightClick(QPoint p);
-
     void OnProjectNewFileClicked();
     void OnProjectNewSubfolderClicked();
     void OnProjectNewFileAtRootClicked();
@@ -44,7 +47,6 @@ private slots:
     void OnProjectDeleteFolderClicked();
     void OnRenameClicked();
     QModelIndex GetTreeSelectedIndex();
-
     void AddPathsToWatcher(const QString& root);
 
 public:
@@ -57,7 +59,6 @@ public:
     void SetProjectFileConverter(ProjectFileConverter* converter);
     const Project* GetProject() const;
     QTreeView *GetTree();
-
     QFileInfo FileAt(QModelIndex index);
 
 public slots:
