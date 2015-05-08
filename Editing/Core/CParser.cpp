@@ -13,6 +13,7 @@ CParser::CParser(const CEditorPage* textEdit)
     connect(this, SIGNAL(DiagnosticsReady(std::vector<DiagnosticDTO>)), this->textEdit, SLOT(ShowDiagnostics(std::vector<DiagnosticDTO>)));
     connect(this, SIGNAL(CompletionSuggestionsReady(QStringList)), this->textEdit, SLOT(SetCompletionModel(QStringList)));
 
+
 }
 
 void CParser::ActivateTimer()
@@ -32,11 +33,12 @@ void CParser::Parse()
     const char* text = b.constData();
 
     QByteArray ba = textEdit->property("filePath").toByteArray();
-
     const char* fileName = ba.constData();
+
     CXUnsavedFile unsavedFile = { .Filename = fileName,  .Contents = text, .Length = strlen(text) };
     CXUnsavedFile* unsavedFiles = new CXUnsavedFile[1];
     unsavedFiles[0] = unsavedFile;
+
 
     translationUnit = clang_parseTranslationUnit(index, fileName, args, numArgs, unsavedFiles, 1, CXTranslationUnit_DetailedPreprocessingRecord);
 
@@ -115,10 +117,27 @@ void CParser::Parse()
             diagDTOList.push_back(diagDTO);
 
             clang_disposeString(message);
+            clang_disposeDiagnostic(diag);
         }
     }
 
     emit DiagnosticsReady(diagDTOList);
+
+    //clang_disposeDiagnosticSet(diagnosticSet);
+}
+
+void CParser::GenerateCompleterSuggestions()
+{
+    QByteArray b = textEdit->toPlainText().toLocal8Bit();
+    unsigned int len = b.length();
+    const char* text = b.constData();
+
+    QByteArray ba = textEdit->property("filePath").toByteArray();
+    const char* fileName = ba.constData();
+
+    CXUnsavedFile unsavedFile = { .Filename = fileName,  .Contents = text, .Length = strlen(text) };
+    CXUnsavedFile* unsavedFiles = new CXUnsavedFile[1];
+    unsavedFiles[0] = unsavedFile;
 
     ClearCompletionList(); // clean the previous code completion list
 
@@ -145,8 +164,6 @@ void CParser::Parse()
 
                     this->AddToCompletionList(completionItem);
 
-                    //qDebug() << completionItem << " ";
-
                     clang_disposeString(chunkString);
                 }
             }
@@ -155,12 +172,8 @@ void CParser::Parse()
         clang_disposeCodeCompleteResults(completions);
     }
 
-    //qDebug() << "\n\n\n\n";
     delete unsavedFiles;
-
     emit CompletionSuggestionsReady(this->completionList);
-
-    clang_disposeDiagnosticSet(diagnosticSet);
 }
 
 void CParser::AddToCompletionList(const char *completionItem)
@@ -171,7 +184,6 @@ void CParser::AddToCompletionList(const char *completionItem)
         return;
 
     this->completionList.append(s);
-    //qDebug() << "Appended " << completionItem << " to model.";
 }
 void CParser::ClearCompletionList()
 {

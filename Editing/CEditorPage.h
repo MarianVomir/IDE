@@ -44,6 +44,7 @@ protected:
     void keyPressEvent(QKeyEvent* e);
     void focusInEvent(QFocusEvent* e);
     void mouseMoveEvent(QMouseEvent* e);
+    void PopupCompleter();
 
 private slots:
     void insertCompletion(QString completion);

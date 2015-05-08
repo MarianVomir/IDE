@@ -16,6 +16,8 @@ class CParser : QObject
 
 #define PARSING_INTERVAL 500 // milliseconds
 
+private:
+
 signals:
     void DiagnosticsReady(std::vector<DiagnosticDTO>);
     void CompletionSuggestionsReady(QStringList);
@@ -26,6 +28,7 @@ public:
 
 public slots:
     void Parse();
+    void GenerateCompleterSuggestions();
 
 protected:
     const CEditorPage* textEdit;    // The page from the tab editor on which this parser operates
@@ -39,6 +42,7 @@ protected:
 
 protected slots:
     void ActivateTimer();
+
 };
 
 #endif // CPARSER_H

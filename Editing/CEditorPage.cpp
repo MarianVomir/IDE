@@ -7,11 +7,9 @@ CEditorPage::CEditorPage()
     parser = new CParser(this);
 
     completer->setWidget(this);
-
-  //  QCompleter::
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModelSorting(QCompleter::UnsortedModel);
     completer->setCompletionMode(QCompleter::PopupCompletion);
-   // completer->setCaseSensitivity(Qt::CaseInsensitive);
 
     connect(completer, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(DisplayTooltipForDiagnosticUnderCursor()));
@@ -89,29 +87,25 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
     this->diags = diags;
     // keep the new diagnostics
 
-
-
     QTextCursor c = this->textCursor();
     QTextCursor cursor = this->textCursor();
 
-   // cursor.beginEditBlock();
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
     cursor.setCharFormat(standardFormat);
-   // cursor.endEditBlock();
+
     this->setTextCursor(cursor);
     for (DiagnosticDTO& diag : diags)
     {
         cursor = this->textCursor();
 
-      //  cursor.beginEditBlock();
         cursor.setPosition(diag.offset, QTextCursor::MoveAnchor);
         cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, diag.length);
         if (diag.severity == CXDiagnostic_Error || diag.severity == CXDiagnostic_Fatal)
             cursor.setCharFormat(errorFormat);
         if (diag.severity == CXDiagnostic_Warning)
             cursor.setCharFormat(warningFormat);
-    //    cursor.endEditBlock();
+
         this->setTextCursor(cursor);
     }
     this->setTextCursor(c);
@@ -125,6 +119,7 @@ void CEditorPage::SetCompletionModel(QStringList l)
     QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
 
     completerModel->setStringList(l);
+    this->PopupCompleter();
    /* completer->model()->set
     completer->popup()->selectionModel()->select(completer->completionModel()->index(0,0), QItemSelectionModel::Select
        );*/
@@ -167,60 +162,49 @@ void CEditorPage::focusInEvent(QFocusEvent *e)
 
 void CEditorPage::keyPressEvent(QKeyEvent *e)
 {
-   /* QPlainTextEdit::keyPressEvent(e);
-    return;*/
-
-    if (completer != NULL && completer->popup()->isVisible())
-    {
-        switch(e->key())
-        {
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-        case Qt::Key_Escape:
-        case Qt::Key_Tab:
-        case Qt::Key_Backtab:
+    if (completer && completer->popup()->isVisible()) {
+        // The following keys are forwarded by the completer to the widget
+       switch (e->key()) {
+       case Qt::Key_Enter:
+       case Qt::Key_Return:
+       case Qt::Key_Escape:
+       case Qt::Key_Tab:
+       case Qt::Key_Backtab:
             e->ignore();
-            return;
-        default:
-            break;
-        }
+            return; // let the completer do default behavior
+       default:
+           break;
+       }
     }
 
-    QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
-
-    bool completerCalled = (e->key() == Qt::Key_Space && (e->modifiers() & Qt::ControlModifier)); // ctrl-space pressed
-
-
-    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space);
-    if (completer == NULL || ! completerCalled) /* || !isShortcut)*/
-    {
+    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+    if (!completer || !isShortcut) // dont process the shortcut when we have a completer
         QPlainTextEdit::keyPressEvent(e);
-        return;
-    }
+
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
-    if (completer == NULL || (ctrlOrShift && e->text().isEmpty()))
-         return;
+    if (!completer || (ctrlOrShift && e->text().isEmpty()))
+        return;
 
-     static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-=\n\t "); // end of word
-     //static QString eow("~!@#$%^&*()_+{}|:\"<>?,/;'[]\\-="); // end of word
-
+     static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
      QString completionPrefix = textUnderCursor();
 
-    if (/*!isShortcut && (hasModifier || */e->text().isEmpty() /*|| eow.contains(e->text().right(1))*/ || completionPrefix.length() < 1)
-    {
-        completer->popup()->hide();
-        return;
-    }
+     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 2
+                       || eow.contains(e->text().right(1)))) {
+         completer->popup()->hide();
+         return;
+     }
 
-    if (completionPrefix != completer->completionPrefix())
-    {
-        completer->setCompletionPrefix(completionPrefix);
-        completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
-    }
+     if (completionPrefix != completer->completionPrefix()) {
+         completer->setCompletionPrefix(completionPrefix);
+         completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+     }
 
+     parser->GenerateCompleterSuggestions();
+}
+void CEditorPage::PopupCompleter()
+{
     QRect cr = cursorRect();
     cr.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
-
-    completer->complete(cr);
+    completer->complete(cr); // popup it up!
 }
