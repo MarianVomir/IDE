@@ -1,6 +1,6 @@
 #include "Global.h"
 
-Project* Global::ActiveProject = NULL;
+//Project* Global::ActiveProject = NULL;
 QJsonObject Global::defaultProjectValues;
 
 Global::Global()

@@ -9,6 +9,7 @@ ProjectExplorer::ProjectExplorer()
     converter = NULL;
     projectModel = new QDirModel(NULL);
     watcher = NULL;
+    activeProject = NULL;
 
     rootRightClickMenu = new QMenu(NULL);
     fileRightClickMenu = new QMenu(NULL);
@@ -67,10 +68,10 @@ void ProjectExplorer::CloseActiveProject()
         delete this->projectModel;
         this->projectModel = NULL;
     }
-    if (Global::ActiveProject != NULL)
+    if (this->activeProject != NULL)
     {
-        delete Global::ActiveProject;
-        Global::ActiveProject = NULL;
+        delete this->activeProject;
+        this->activeProject = NULL;
     }
     if (this->watcher != NULL)
     {
@@ -98,12 +99,12 @@ void ProjectExplorer::SetActiveProject(Project *project)
         FileManager::CreateFile(project->Root() + project->Name() + ".proj");
     // create proj file
 
-    Global::ActiveProject = project;
+    this->activeProject = project;
 
     /*
     watcher = new QFileSystemWatcher();
     connect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(AddPathsToWatcher(QString)));
-    AddPathsToWatcher(Global::ActiveProject->Root() + "src/");
+    AddPathsToWatcher(this->activeProject->Root() + "src/");
     */
 
     this->projectModel = new ProjectDirModel(NULL, project->Name());
@@ -112,13 +113,13 @@ void ProjectExplorer::SetActiveProject(Project *project)
 
     this->projectTree->setModel(projectModel);
 
-    this->projectTree->setRootIndex(projectModel->index(Global::ActiveProject->Root() + "src/"));
+    this->projectTree->setRootIndex(projectModel->index(this->activeProject->Root() + "src/"));
     this->projectTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
     for (int i = 1; i < projectModel->columnCount(); i++)
         this->projectTree->setColumnHidden(i, true);
 
-    this->converter->ProjectToFile(Global::ActiveProject, Global::ActiveProject->Root() + Global::ActiveProject->Name() + ".proj");
+    this->converter->ProjectToFile(this->activeProject, this->activeProject->Root() + this->activeProject->Name() + ".proj");
 }
 void ProjectExplorer::SetTree(QTreeView* tree)
 {
@@ -140,9 +141,9 @@ void ProjectExplorer::SetProjectFileConverter(ProjectFileConverter *converter)
 {
     this->converter = converter;
 }
-const Project* ProjectExplorer::GetProject() const
+Project *ProjectExplorer::GetProject()
 {
-    return Global::ActiveProject;
+    return this->activeProject;
 }
 QTreeView* ProjectExplorer::GetTree()
 {
@@ -222,12 +223,12 @@ void ProjectExplorer::OnProjectNewSubfolderClicked()
 
 void ProjectExplorer::OnProjectNewFileAtRootClicked()
 {
-    this->CreateFile(Global::ActiveProject->Root() + "src/" + newFileBaseName);
+    this->CreateFile(this->activeProject->Root() + "src/" + newFileBaseName);
 }
 
 void ProjectExplorer::OnProjectNewFolderAtRootClicked()
 {
-    this->CreateDir(Global::ActiveProject->Root() + "src/" + newFolderBaseName);
+    this->CreateDir(this->activeProject->Root() + "src/" + newFolderBaseName);
 }
 
 void ProjectExplorer::OnProjectDeleteFileClicked()
@@ -300,7 +301,7 @@ void ProjectExplorer::CreateFile(const QString& filePath)
 
         QQueue<QModelIndex> queue;
 
-        queue.enqueue(projectModel->index(Global::ActiveProject->Root() + "/src/"));
+        queue.enqueue(projectModel->index(this->activeProject->Root() + "/src/"));
         while (queue.size() > 0)
         {
             QModelIndex crtParent = queue.dequeue();
@@ -349,7 +350,7 @@ void ProjectExplorer::CreateDir(const QString& dirPath)
 
          QQueue<QModelIndex> queue;
 
-         queue.enqueue(projectModel->index(Global::ActiveProject->Root() + "/src/"));
+         queue.enqueue(projectModel->index(this->activeProject->Root() + "/src/"));
          while (queue.size() > 0)
          {
              QModelIndex crtParent = queue.dequeue();

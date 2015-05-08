@@ -26,6 +26,12 @@ NewProjectDialog::NewProjectDialog(QWidget* parent) :
     ui->txt_Compiler->setCompleter(completer);
     ui->txt_Make->setCompleter(completer);
     ui->txt_Debugger->setCompleter(completer);
+
+    ui->txt_Compiler->setText(Global::defaultProjectValues["compiler_default"].toString());
+    ui->txt_Debugger->setText(Global::defaultProjectValues["debugger_default"].toString());
+    ui->txt_Make->setText(Global::defaultProjectValues["make_default"].toString());
+    ui->txt_CompilerFlags->setText(Global::defaultProjectValues["compilerFlags_default"].toString());
+    ui->txt_LinkerFlags->setText(Global::defaultProjectValues["linkerFlags_default"].toString());
 }
 NewProjectDialog::~NewProjectDialog()
 {

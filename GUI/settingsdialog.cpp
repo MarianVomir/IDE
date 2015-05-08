@@ -1,16 +1,30 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
+SettingsDialog::SettingsDialog(ProjectExplorer* projectExplorer, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::SettingsDialog)
+    ui(new Ui::SettingsDialog), projectExplorer(projectExplorer)
 {
     ui->setupUi(this);
 
-    /*
-    General Tab
-    - dunno what to put here, fonts maybe if i have time
-    */
+    connect(ui->btn_BrowseDebugger, SIGNAL(clicked()), this, SLOT(OnBrowseDebuggerClicked()));
+    connect(ui->btn_BrowseCompiler, SIGNAL(clicked()), this, SLOT(OnBrowseCompilerClicked()));
+    connect(ui->btn_BrowseMake, SIGNAL(clicked()), this, SLOT(OnBrowseMakeClicked()));
+    connect(ui->btn_BrowseDebugger_Default, SIGNAL(clicked()), this, SLOT(OnBrowseDebuggerDefaultClicked()));
+    connect(ui->btn_BrowseCompiler_Default, SIGNAL(clicked()), this, SLOT(OnBrowseCompilerDefaultClicked()));
+    connect(ui->btn_BrowseMake_Default, SIGNAL(clicked()), this, SLOT(OnBrowseMakeDefaultClicked()));
+
+    completer = new QCompleter(this);
+    model = new QDirModel(completer);
+
+    completer->setModel(model);
+    ui->txt_Compiler->setCompleter(completer);
+    ui->txt_Make->setCompleter(completer);
+    ui->txt_Debugger->setCompleter(completer);
+    ui->txt_Compiler_Default->setCompleter(completer);
+    ui->txt_Make_Default->setCompleter(completer);
+    ui->txt_Debugger_Default->setCompleter(completer);
+
     try
     {
         Load();
@@ -19,75 +33,48 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     {
         QMessageBox::warning(NULL, "Cannot load settings", e.Message());
     }
-
-    // get data from qsettings
-    /*
-    Default data
-    - use QSettings or something to store it
-    */
 }
 
 void SettingsDialog::Load()
 {
-    if (Global::ActiveProject != NULL)
+    proj = this->projectExplorer->GetProject();
+
+    if (proj != NULL)
     {
-        Project* proj = Global::ActiveProject;
         ui->txt_Compiler->setText(proj->Compiler());
         ui->txt_Make->setText(proj->MakeUtility());
         ui->txt_Debugger->setText(proj->Debugger());
         ui->txt_LinkerFlags->setText(proj->LinkerFlags());
         ui->txt_CompilerFlags->setText(proj->CompilerFlags());
     }
-
-    QString fileContents;
-    QFile settingsFile("settings");
-    bool failed = false;
-    if (!settingsFile.exists())
-    {
-        failed = true;
-    }
     else
     {
-        fileContents = FileManager::ReadFile("settings");
+        ui->txt_Compiler->setEnabled(false);
+        ui->txt_Make->setEnabled(false);
+        ui->txt_Debugger->setEnabled(false);
+        ui->txt_LinkerFlags->setEnabled(false);
+        ui->txt_CompilerFlags->setEnabled(false);
+        ui->btn_BrowseCompiler->setEnabled(false);
+        ui->btn_BrowseDebugger->setEnabled(false);
+        ui->btn_BrowseMake->setEnabled(false);
     }
 
-    QString compiler, linker, make, compilerFlags, linkerFlags;
-
-    if (failed)
-    {
-        compiler = "";
-        linker = "";
-        make = "";
-        compilerFlags = "";
-        linkerFlags = "";
-    }
-    else
-    {
-        QJsonDocument doc(QJsonDocument::fromJson(fileContents.toLocal8Bit()));
-        QJsonObject jsonObject = doc.object();
-
-        compiler = jsonObject["compiler_default"].toString();
-        linker = jsonObject["debugger_default"].toString();
-        make = jsonObject["make_default"].toString();
-        compilerFlags = jsonObject["compiler_default"].toString();
-        linkerFlags = jsonObject["linkerFlags_default"].toString();
-    }
-
-    ui->txt_Compiler_Default->setText(compiler);
-    ui->txt_Debugger_Default->setText(linker);
-    ui->txt_Make_Default->setText(make);
-    ui->txt_CompilerFlags_Default->setText(compilerFlags);
-    ui->txt_LinkerFlags_Default->setText(linkerFlags);
+    ui->txt_Compiler_Default->setText(Global::defaultProjectValues["compiler_default"].toString());
+    ui->txt_Debugger_Default->setText(Global::defaultProjectValues["debugger_default"].toString());
+    ui->txt_Make_Default->setText(Global::defaultProjectValues["make_default"].toString());
+    ui->txt_CompilerFlags_Default->setText(Global::defaultProjectValues["compilerFlags_default"].toString());
+    ui->txt_LinkerFlags_Default->setText(Global::defaultProjectValues["linkerFlags_default"].toString());
 }
 
 void SettingsDialog::Save()
 {
-    Project* proj = Global::ActiveProject;
+    Project* proj = projectExplorer->GetProject();
     QJsonDocument jsonDoc;
     if (proj != NULL)
     {
         QJsonObject projObject;
 
+        projObject["name"] = proj->Name();
         projObject["compiler"] = ui->txt_Compiler->text();
         projObject["debugger"] = ui->txt_Debugger->text();
         projObject["make"] = ui->txt_Make->text();
@@ -102,7 +89,7 @@ void SettingsDialog::Save()
         proj->SetCompilerFlags(ui->txt_CompilerFlags->text());
         proj->SetLinkerFlags(ui->txt_LinkerFlags->text());
 
-        FileManager::WriteFile(Global::ActiveProject->Root() + Global::ActiveProject->Name() + ".proj", jsonDoc.toJson());
+        FileManager::WriteFile(proj->Root() + proj->Name() + ".proj", jsonDoc.toJson());
     }
 
     QJsonObject defaultObject;
@@ -115,8 +102,8 @@ void SettingsDialog::Save()
 
     jsonDoc.setObject(defaultObject);
 
-    FileManager::WriteFile("settings", jsonDoc.toJson());
     Global::defaultProjectValues = defaultObject;
+    SettingsManager::SaveProjectDefaults();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -140,4 +127,58 @@ void SettingsDialog::on_btn_OK_clicked()
 void SettingsDialog::on_btn_Cancel_clicked()
 {
     this->reject();
+}
+
+void SettingsDialog::OnBrowseCompilerClicked()
+{
+    QString compiler = QFileDialog::getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
+
+    if (compiler.size() != 0)
+    {
+        ui->txt_Compiler->setText(compiler);
+    }
+}
+void SettingsDialog::OnBrowseDebuggerClicked()
+{
+    QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
+    if (debugger.size() != 0)
+    {
+        ui->txt_Debugger->setText(debugger);
+    }
+}
+void SettingsDialog::OnBrowseMakeClicked()
+{
+    QString make = QFileDialog::getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
+
+    if (make.size() != 0)
+    {
+        ui->txt_Make->setText(make);
+    }
+}
+
+void SettingsDialog::OnBrowseCompilerDefaultClicked()
+{
+    QString compiler = QFileDialog::getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
+
+    if (compiler.size() != 0)
+    {
+        ui->txt_Compiler_Default->setText(compiler);
+    }
+}
+void SettingsDialog::OnBrowseDebuggerDefaultClicked()
+{
+    QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
+    if (debugger.size() != 0)
+    {
+        ui->txt_Debugger_Default->setText(debugger);
+    }
+}
+void SettingsDialog::OnBrowseMakeDefaultClicked()
+{
+    QString make = QFileDialog::getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
+
+    if (make.size() != 0)
+    {
+        ui->txt_Make_Default->setText(make);
+    }
 }

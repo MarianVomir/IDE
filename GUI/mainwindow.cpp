@@ -224,7 +224,7 @@ void MainWindow::on_actionOutputWindow_toggled(bool arg1)
 
 void MainWindow::on_actionOpen_Settings_triggered()
 {
-    SettingsDialog settingsDialog(this);
+    SettingsDialog settingsDialog(projectExplorer, this);
     settingsDialog.setModal(true);
     settingsDialog.exec();
 }

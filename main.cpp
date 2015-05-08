@@ -20,6 +20,15 @@ int main(int argc, char *argv[])
     EditorPageFactory::Creators().insert("c", new CEditorPageCreator()); // C language (.c's)
     EditorPageFactory::Creators().insert("h", new CEditorPageCreator()); // C headers (same as .c's)
 
+    try
+    {
+        SettingsManager::LoadProjectDefaults();
+    }
+    catch (Exception& e)
+    {
+        qDebug() << "Cannot load default project settings from file.";
+    }
+
     QApplication a(argc, argv);
     MainWindow w;
     w.showMaximized();

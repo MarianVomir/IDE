@@ -117,13 +117,13 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
 */
 
         ss << "\n";
-        ss << "\t" << "$(compiler) -Wall -g $(cFlags)" << " -c " << validSourceFileList[i].toStdString() << " -o " << objectFileList[i].toStdString() << "\n";
+        ss << "\t" << "$(compiler) -Wall -g" << " -c " << validSourceFileList[i].toStdString() << " -o " << objectFileList[i].toStdString() << " $(cFlags)\n";
     }
 
     ss << ".PHONY: clean rm all find" << "\n";
 
     ss << "clean:\n\tfind obj/ -name '*.o' -type f -delete";
-    ss << "\n\t rm bin/" + project.Name().toStdString();
+    ss << "\n\trm bin/" + project.Name().toStdString();
     return QString(ss.str().c_str());
 }
 

@@ -23,6 +23,7 @@ class ProjectExplorer : public QObject
 
 private:
     QMutex mtx;
+    Project* activeProject;
 
     const static QString newFolderBaseName;
     const static QString newFileBaseName;
@@ -57,7 +58,7 @@ public:
     void SetActiveProject(Project* proj);
     void SetTree(QTreeView* tree);
     void SetProjectFileConverter(ProjectFileConverter* converter);
-    const Project* GetProject() const;
+    Project* GetProject();
     QTreeView *GetTree();
     QFileInfo FileAt(QModelIndex index);
 

@@ -8,7 +8,7 @@
 class Global
 {
 public:
-    static Project* ActiveProject;
+    //static Project* ActiveProject;
     static QJsonObject defaultProjectValues;
     // visual styles
 
