@@ -35,7 +35,7 @@ void CParser::Parse()
     QByteArray ba = textEdit->property("filePath").toByteArray();
     const char* fileName = ba.constData();
 
-    CXUnsavedFile unsavedFile = { .Filename = fileName,  .Contents = text, .Length = strlen(text) };
+    CXUnsavedFile unsavedFile = { .Filename = fileName,  .Contents = text, .Length = len };
     CXUnsavedFile* unsavedFiles = new CXUnsavedFile[1];
     unsavedFiles[0] = unsavedFile;
 
@@ -135,7 +135,7 @@ void CParser::GenerateCompleterSuggestions()
     QByteArray ba = textEdit->property("filePath").toByteArray();
     const char* fileName = ba.constData();
 
-    CXUnsavedFile unsavedFile = { .Filename = fileName,  .Contents = text, .Length = strlen(text) };
+    CXUnsavedFile unsavedFile = { .Filename = fileName,  .Contents = text, .Length = len };
     CXUnsavedFile* unsavedFiles = new CXUnsavedFile[1];
     unsavedFiles[0] = unsavedFile;
 

@@ -1,13 +1,13 @@
 #ifndef EDITORPAGEFACTORY_H
 #define EDITORPAGEFACTORY_H
 
+#include <QString>
+#include <QMap>
+
 #include "Editing/EditorPage.h"
 #include "Editing/EditorPageCreator.h"
 #include "Editing/DefaultEditorPageCreator.h"
 #include "Editing/CEditorPageCreator.h"
-
-#include <QString>
-#include <QMap>
 
 class EditorPageFactory
 {

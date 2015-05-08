@@ -1,10 +1,10 @@
 #ifndef PROJECTRUNNER_H
 #define PROJECTRUNNER_H
 
+#include <QProcess>
+
 #include "ProjectBuilder.h"
 #include "OutputWriter.h"
-
-#include <QProcess>
 
 class ProjectRunner : public QObject
 {

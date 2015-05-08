@@ -1,12 +1,13 @@
 #ifndef CPARSER_H
 #define CPARSER_H
 
-#include "DiagnosticDTO.h"
-
-#include <clang-c/Index.h>
-#include <QTimer>
 #include <iostream>
 
+#include <clang-c/Index.h>
+
+#include <QTimer>
+
+#include "DiagnosticDTO.h"
 class CParser;
 #include "Editing/CEditorPage.h"
 

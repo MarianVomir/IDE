@@ -2,8 +2,6 @@
 #define PROJECT_H
 
 #include <QString>
-#include <QSet>
-#include <QException>
 
 using namespace std;
 

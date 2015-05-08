@@ -1,11 +1,11 @@
 #ifndef LISTOUTPUTWRITER_H
 #define LISTOUTPUTWRITER_H
 
-#include "OutputWriter.h"
-
 #include <QListWidget>
 #include <QMutex>
 #include <QMutexLocker>
+
+#include "OutputWriter.h"
 
 class ListOutputWriter : public OutputWriter
 {

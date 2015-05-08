@@ -1,8 +1,9 @@
 #ifndef DEFAULTEDITORPAGE_H
 #define DEFAULTEDITORPAGE_H
 
-#include "Editing/EditorPage.h"
 #include <QTextEdit>
+
+#include "Editing/EditorPage.h"
 
 /**
 This is a simple EditorPage used when no specialized page is available for a given file type/extension.

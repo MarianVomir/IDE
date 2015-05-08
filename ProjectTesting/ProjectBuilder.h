@@ -1,11 +1,10 @@
 #ifndef PROJECTBUILDER_H
 #define PROJECTBUILDER_H
 
-#include "Project.h"
-
-#include "OutputWriter.h"
-
 #include <QObject>
+
+#include "Project.h"
+#include "OutputWriter.h"
 
 class ProjectBuilder : public QObject
 {

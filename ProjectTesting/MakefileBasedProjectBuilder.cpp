@@ -245,7 +245,8 @@ int MakefileBasedProjectBuilder::Build(const Project& proj)
     }
     catch (FileSystemException& ex)
     {
-        // show errors while creating makefile
+        qDebug() << "Could not create makefile";
+        return QProcess::FailedToStart;
     }
     process->setWorkingDirectory(proj.Root());
     process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + proj.Name());

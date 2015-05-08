@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QDir>
 #include <QDirIterator>
-
 #include <QDebug>
 
 #include "Exceptions.h"

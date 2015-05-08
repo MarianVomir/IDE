@@ -1,7 +1,6 @@
 ﻿#ifndef EDITOR_H
 #define EDITOR_H
 
-#include "EditorPageFactory.h"
 #include <QTabWidget>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -9,6 +8,7 @@
 #include <QPaintEvent>
 #include <QFileSystemWatcher>
 
+#include "EditorPageFactory.h"
 #include "FileManager.h"
 
 class Editor : QWidget
