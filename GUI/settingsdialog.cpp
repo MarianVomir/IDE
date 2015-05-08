@@ -102,9 +102,7 @@ void SettingsDialog::Save()
 
     jsonDoc.setObject(defaultObject);
 
-    Global::defaultProjectValues = defaultObject;
-
-    SettingsManager::SaveProjectDefaults();
+    SettingsManager::SaveProjectDefaults(defaultObject);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -117,12 +115,12 @@ void SettingsDialog::on_btn_OK_clicked()
     try
     {
         this->Save();
+        this->accept();
     }
     catch (FileSystemException& e)
     {
         QMessageBox::warning(NULL, "Cannot save settings", e.Message());
     }
-    this->accept();
 }
 
 void SettingsDialog::on_btn_Cancel_clicked()

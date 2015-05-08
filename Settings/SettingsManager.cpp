@@ -1,5 +1,7 @@
 #include "SettingsManager.h"
 
+QString SettingsManager::projectDefaultSettingsFile = "settings_projectdefault";
+
 SettingsManager::SettingsManager()
 {
 
@@ -13,8 +15,7 @@ SettingsManager::~SettingsManager()
 void SettingsManager::LoadProjectDefaults()
 {
     QString fileContents;
-    static QString fileName = "settings_projectdefault";
-    QFile settingsFile(fileName);
+    QFile settingsFile(projectDefaultSettingsFile);
     bool failed = false;
     if (!settingsFile.exists())
     {
@@ -22,7 +23,7 @@ void SettingsManager::LoadProjectDefaults()
     }
     else
     {
-        fileContents = FileManager::ReadFile(fileName);
+        fileContents = FileManager::ReadFile(projectDefaultSettingsFile);
     }
 
     QString compiler, linker, make, compilerFlags, linkerFlags;
@@ -52,8 +53,9 @@ void SettingsManager::LoadProjectDefaults()
 }
 
 
-void SettingsManager::SaveProjectDefaults()
+void SettingsManager::SaveProjectDefaults(const QJsonObject& defaultObject)
 {
-    FileManager::WriteFile("settings_projectdefault", QJsonDocument(Global::defaultProjectValues).toJson());
+    FileManager::WriteFile(projectDefaultSettingsFile, QJsonDocument(Global::defaultProjectValues).toJson());
+    Global::defaultProjectValues = defaultObject;
 }
 
