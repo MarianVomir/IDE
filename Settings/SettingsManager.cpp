@@ -53,5 +53,7 @@ void SettingsManager::LoadProjectDefaults()
 
 
 void SettingsManager::SaveProjectDefaults()
-{}
+{
+    FileManager::WriteFile("settings_projectdefault", QJsonDocument(Global::defaultProjectValues).toJson());
+}
 

@@ -133,14 +133,15 @@ void CEditorPage::insertCompletion(QString completion)
     }
 
     QTextCursor tc = textCursor();
+    tc.select(QTextCursor::WordUnderCursor);
 
-    int remaining = completion.size() - completer->completionPrefix().size();
-
+    /*int remaining = completion.size() - completer->completionPrefix().size();
+*/
     /*QString prefix = completer->completionPrefix();
     while (completion[i] == prefix[i])
         tc.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
 */
-    tc.insertText(completion.right(remaining));
+    tc.insertText(completion);//.right(remaining));
 
     setTextCursor(tc);
 }
@@ -189,8 +190,28 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
      QString completionPrefix = textUnderCursor();
 
-     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 2
-                       || eow.contains(e->text().right(1)))) {
+     QString text = this->toPlainText();
+     QTextCursor cursor = this->textCursor();
+
+     this->completer->setCompletionMode(QCompleter::PopupCompletion);
+     if (cursor.position() >= 0 && cursor.position() <= text.size())
+     {
+         if (
+                 (text[cursor.position() - 1] == '.')
+                 ||
+                 ((cursor.position() >= 1 && text[cursor.position() - 2] == '-' && text[cursor.position() - 1] == '>'))
+         )
+         {
+             this->completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+             completionPrefix = "";
+             //this->parser->GenerateCompleterSuggestions();
+             //return;
+         }
+
+     }
+    qDebug() << completionPrefix;
+     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1
+                       /*|| eow.contains(e->text().right(1))*/)) {
          completer->popup()->hide();
          return;
      }

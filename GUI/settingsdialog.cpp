@@ -103,6 +103,7 @@ void SettingsDialog::Save()
     jsonDoc.setObject(defaultObject);
 
     Global::defaultProjectValues = defaultObject;
+
     SettingsManager::SaveProjectDefaults();
 }
 
