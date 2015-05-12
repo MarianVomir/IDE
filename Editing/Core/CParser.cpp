@@ -25,7 +25,7 @@ void CParser::ActivateTimer()
 
 void CParser::Parse()
 {
-    static const char* args[] = { "-c", "-x", "c", "-Wall", "-fsyntax-only" };
+    static const char* args[] = { "-c", "-x", "c", "-Wall", "-pedantic", "-fsyntax-only" };
     static int numArgs = 5;
 
     QByteArray b = textEdit->toPlainText().toLocal8Bit();
@@ -101,17 +101,23 @@ void CParser::Parse()
                 if (offset > 0)
                     offset--;
 
+            static char* separators = " \n\r[];(){}=<>*+-\0";
             if (offset < len && (text[offset] == '\n' || text[offset] == '\r'))
                 offset--;
 
+/*            if (offset < len && strchr(separators, text[offset]))
+                offset--;
+*/
             CXString message = clang_getDiagnosticSpelling(diag);
             diagDTO.offset = offset;
             diagDTO.severity = clang_getDiagnosticSeverity(diag);
 
             int k = offset;
-            while (text[k] != '\0' && text[k] != '\n' && text[k] != ';')
+            /*while (text[k] != '\0' && text[k] != '\n' && text[k] != ';')
                 k++;
-
+*/
+            while (!strchr(separators, text[k]))
+                k++;
             diagDTO.length = k - offset;
             diagDTO.message = clang_getCString(message);
             diagDTOList.push_back(diagDTO);

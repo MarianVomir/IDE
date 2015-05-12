@@ -194,12 +194,12 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
      QTextCursor cursor = this->textCursor();
 
      this->completer->setCompletionMode(QCompleter::PopupCompletion);
-     if (cursor.position() >= 0 && cursor.position() <= text.size())
+     if (cursor.position() > 0 && cursor.position() <= text.size())
      {
          if (
                  (text[cursor.position() - 1] == '.')
                  ||
-                 ((cursor.position() >= 1 && text[cursor.position() - 2] == '-' && text[cursor.position() - 1] == '>'))
+                 ((cursor.position() > 1 && text[cursor.position() - 2] == '-' && text[cursor.position() - 1] == '>'))
          )
          {
              this->completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
