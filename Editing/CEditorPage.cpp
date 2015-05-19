@@ -63,7 +63,7 @@ void CEditorPage::DisplayTooltip(const QTextCursor& cursor, const QPoint& point)
 void CEditorPage::DisplayTooltipForDiagnosticUnderCursor()
 {
     QTextCursor cursor = this->textCursor();
-    DisplayTooltip(cursor, this->viewport()->mapToGlobal(this->cursorRect().topLeft()));
+    DisplayTooltip(cursor, this->viewport()->mapToGlobal(this->cursorRect().topLeft() + QPoint(0, -50)));
 }
 
 void CEditorPage::mouseMoveEvent(QMouseEvent* e)

@@ -76,7 +76,7 @@ void CParser::Parse()
                 diagDTO.col = col1;
                 diagDTO.offset = offset1;
                 diagDTO.severity = clang_getDiagnosticSeverity(diag);
-                diagDTO.length = offset2 - offset1;
+                diagDTO.length = qMax(offset2 - offset1, (unsigned int)1);
                 diagDTO.message = clang_getCString(message);
                 diagDTOList.push_back(diagDTO);
 
@@ -118,7 +118,7 @@ void CParser::Parse()
 */
             while (!strchr(separators, text[k]))
                 k++;
-            diagDTO.length = k - offset;
+            diagDTO.length = qMax(k - offset, (unsigned int)1);
             diagDTO.message = clang_getCString(message);
             diagDTOList.push_back(diagDTO);
 

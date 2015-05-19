@@ -1,7 +1,6 @@
 #ifndef VISUALSTYLES_H
 #define VISUALSTYLES_H
 
-
 class VisualStyles
 {
 private:
@@ -9,7 +8,6 @@ private:
 
 public:
     ~VisualStyles();
-
 /*
     Default: dark style
         - dark grey background
