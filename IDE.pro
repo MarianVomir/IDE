@@ -44,7 +44,8 @@ SOURCES += main.cpp\
     Editing/Core/CParser.cpp \
     GUI/VisualStyles.cpp \
     Global.cpp \
-    Settings/SettingsManager.cpp
+    Settings/SettingsManager.cpp \
+    Editing/Utility/TextChangeCommand.cpp
 
 HEADERS  += \
     FileManager.h \
@@ -80,7 +81,8 @@ HEADERS  += \
     Editing/Core/DiagnosticDTO.h \
     GUI/VisualStyles.h \
     Global.h \
-    Settings/SettingsManager.h
+    Settings/SettingsManager.h \
+    Editing/Utility/TextChangeCommand.h
 
 FORMS    += \
     GUI/mainwindow.ui \

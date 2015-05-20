@@ -25,6 +25,9 @@ CEditorPage::CEditorPage()
     standardFormat.setForeground(QBrush(QColor(0, 0, 0)));
     warningFormat.setFontUnderline(true);
     warningFormat.setUnderlineColor(QColor(255, 255, 0));
+
+    undoStack.setUndoLimit(300);
+    connect(this->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(contentsChanged(int,int,int)));
 }
 
 CEditorPage::~CEditorPage()
@@ -157,6 +160,18 @@ void CEditorPage::focusInEvent(QFocusEvent *e)
     QPlainTextEdit::focusInEvent(e);
 }
 
+void CEditorPage::contentsChanged(int from, int removed, int added)
+{
+    QString removedText = currentText.mid(from, removed);
+
+    currentText = document()->toPlainText();
+    QString addedText = currentText.mid(from, added);
+
+    TextChangeCommand* cmd = new TextChangeCommand(from, removedText, addedText, this);
+    qDebug() << " PUSHED " << from << " " << removedText << " " << addedText;
+    undoStack.push(cmd);
+}
+
 void CEditorPage::keyPressEvent(QKeyEvent *e)
 {
     if (completer && completer->popup()->isVisible()) {
@@ -174,10 +189,33 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
        }
     }
 
- //   bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
- /*   if (!completer || !isShortcut) // dont process the shortcut when we have a completer
+    /** UNDO REDO FRAMEWORK
+     */
+    bool isControlModifier = (e->modifiers() & Qt::ControlModifier);
+    bool isShiftModifier = (e->modifiers() & Qt::ShiftModifier);
 
-*/        QPlainTextEdit::keyPressEvent(e);
+    if (isControlModifier && isShiftModifier && e->key() == Qt::Key_Z) // disallow default ctrl-shift-Z redo
+        return;
+
+    if (isControlModifier)
+    {
+        if (e->key() == Qt::Key_Z)  // ctrl-Z -> undo
+        {
+            if (undoStack.canUndo())
+                undoStack.undo();
+            return;
+        }
+        else if (e->key() == Qt::Key_Y) // ctrl-Y -> redo
+        {
+            if (undoStack.canRedo())
+                undoStack.redo();
+            return;
+        }
+    }
+    /** End of UNDO REDO FRAMEWORK **/
+
+    QPlainTextEdit::keyPressEvent(e);
+
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     if (!completer || (ctrlOrShift && e->text().isEmpty()))
         return;
@@ -190,8 +228,6 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
      {
          completionPrefix = textUnderCursor(1);
      }
-
-     qDebug() << completionPrefix;
 
      this->completer->setCompletionMode(QCompleter::PopupCompletion);
 
@@ -210,6 +246,7 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
 
      parser->GenerateCompleterSuggestions();
 }
+
 void CEditorPage::PopupCompleter()
 {
     QRect cr = cursorRect();

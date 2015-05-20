@@ -9,6 +9,9 @@
 #include <QStringListModel>
 #include <QToolTip>
 #include <QMutex>
+#include <QUndoStack>
+
+#include "Editing/Utility/TextChangeCommand.h"
 
 #include "Editing/Utility/CSyntaxHighlighter.h"
 #include "Editing/EditorPage.h"
@@ -32,6 +35,9 @@ private:
     QTextCharFormat warningFormat;
     QTextCharFormat standardFormat;
 
+    QUndoStack undoStack;
+    QString currentText;
+
 public slots:
     void ShowDiagnostics(std::vector<DiagnosticDTO> diags);
     void SetCompletionModel(QStringList l);
@@ -49,6 +55,7 @@ protected:
 private slots:
     void insertCompletion(QString completion);
     void DisplayTooltipForDiagnosticUnderCursor();
+    void contentsChanged(int from, int removed, int added);
 
 private:
     void DisplayTooltip(const QTextCursor& cursor, const QPoint& point);

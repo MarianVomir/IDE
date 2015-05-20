@@ -15,7 +15,7 @@ class CParser : QObject
 {
     Q_OBJECT
 
-#define PARSING_INTERVAL 500 // milliseconds
+#define PARSING_INTERVAL 600 // milliseconds
 
 private:
 

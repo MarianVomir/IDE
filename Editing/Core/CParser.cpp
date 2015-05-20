@@ -115,7 +115,7 @@ void CParser::Parse()
                 if (offset > 0)
                     offset--;
 
-            static char* separators = " \n\r[];(){}=<>*+-\0";
+            static char separators[] = " \n\r[];(){}=<>*+-\0";
             if (offset < len && (text[offset] == '\n' || text[offset] == '\r'))
                 offset--;
 
@@ -163,7 +163,7 @@ void CParser::GenerateCompleterSuggestions()
 
     QTextCursor cursor = textEdit->textCursor();
 
-    static char* structSeparators = ";[](){}~+-*\\/%#$^&|";
+    static char structSeparators[] = ";[](){}~+-*\\/%#$^&|";
     int structMemberAccessorIndex = cursor.position();
     int oldCursorPos = structMemberAccessorIndex;
 
@@ -239,6 +239,7 @@ void CParser::ClearCompletionList()
 CParser::~CParser()
 {
     clang_disposeTranslationUnit(translationUnit);
+    clang_disposeIndex(index);
     delete timer;
 }
 
