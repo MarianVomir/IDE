@@ -25,8 +25,22 @@ void CParser::ActivateTimer()
 
 void CParser::Parse()
 {
-    static const char* args[] = { "-c", "-x", "c", "-Wall", "-pedantic", "-fsyntax-only" };
-    static int numArgs = 5;
+    static const char* args[] = { "-c", "-x", "c",
+                                  "-Wall",
+                                  "-Wunreachable-code",
+                                  "-Wconversion",
+                                  "-Wempty-body",
+                                  "-Wenum-compare",
+                                  "-Wenum-conversion",
+                                  "-Wfloat-equal",
+                                  "-Wformat",
+                                  "-Wformat-extra-args",
+                                  "-Wformat-invalid-specifier",
+                                  "-Wformat-zero-length",
+                                  "-Wheader-guard",
+                                  "-Wnewline-eof"
+                                };
+    static int numArgs = 16;
 
     QByteArray b = textEdit->toPlainText().toLocal8Bit();
     unsigned int len = b.length();
@@ -53,9 +67,9 @@ void CParser::Parse()
         int numRanges = clang_getDiagnosticNumRanges(diag);
         if (numRanges > 0)
         {
-            for (int j = 0; j < numRanges; j++)
+            /*for (int j = 0; j < numRanges; j++)*/
             {
-                CXSourceRange range = clang_getDiagnosticRange(diag, j);
+                CXSourceRange range = clang_getDiagnosticRange(diag, 0); // j);
                 CXSourceLocation startLoc = clang_getRangeStart(range);
                 CXSourceLocation endLoc = clang_getRangeEnd(range);
                 unsigned int offset1;
@@ -147,9 +161,34 @@ void CParser::GenerateCompleterSuggestions()
 
     ClearCompletionList(); // clean the previous code completion list
 
-    QTextCursor c = textEdit->textCursor();
-    int col = c.columnNumber() + 1;
-    int line = c.blockNumber() + 1;
+    QTextCursor cursor = textEdit->textCursor();
+
+    static char* structSeparators = ";[](){}~+-*\\/%#$^&|";
+    int structMemberAccessorIndex = cursor.position();
+    int oldCursorPos = structMemberAccessorIndex;
+
+    bool entered = false;
+    while (structMemberAccessorIndex > 0)
+    {
+        if (text[structMemberAccessorIndex] == '.' || (text[structMemberAccessorIndex] == '>' && text[structMemberAccessorIndex - 1] == '-'))
+        {
+            entered = true;
+            cursor.setPosition(structMemberAccessorIndex + 1);
+            break;
+        }
+        if (strchr(structSeparators, text[structMemberAccessorIndex]))
+        {
+            break;
+        }
+
+        structMemberAccessorIndex--;
+    }
+    if (!entered)
+        cursor.setPosition(oldCursorPos);
+
+    int col = cursor.columnNumber() + 1;
+    int line = cursor.blockNumber() + 1;
+    cursor.setPosition(oldCursorPos);
 
     if (line != 0 && col != 0)
     {
@@ -177,6 +216,7 @@ void CParser::GenerateCompleterSuggestions()
 
         clang_disposeCodeCompleteResults(completions);
     }
+
 
     delete unsavedFiles;
     emit CompletionSuggestionsReady(this->completionList);

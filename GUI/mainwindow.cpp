@@ -168,6 +168,8 @@ void MainWindow::on_actionBuild_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        this->projectExplorer->Refresh();
+
         outputWriter->Clear();
         this->projectBuilder->Build(*project);
     }
@@ -177,6 +179,8 @@ void MainWindow::on_actionClean_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        this->projectExplorer->Refresh();
+
         outputWriter->Clear();
         this->projectBuilder->Clean(*project);
     }
@@ -186,6 +190,8 @@ void MainWindow::on_actionRebuild_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        this->projectExplorer->Refresh();
+
         outputWriter->Clear();
         this->projectBuilder->Rebuild(*project);
     }
@@ -195,6 +201,8 @@ void MainWindow::on_actionRun_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        this->projectExplorer->Refresh();
+
         outputWriter->Clear();
         this->projectRunner->Run(*project);
     }

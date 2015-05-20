@@ -25,7 +25,7 @@ private:
     QCompleter* completer;
     QStringListModel* completerModel;
     QMutex mtx_CompleterModelIsBeingAccessed;
-    QString textUnderCursor() const;
+    QString textUnderCursor(int moveLeft = 0) const;
     std::vector<DiagnosticDTO> diags;
 
     QTextCharFormat errorFormat;

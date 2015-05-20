@@ -116,39 +116,35 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
 
 void CEditorPage::SetCompletionModel(QStringList l)
 {
-    QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
+ /*   qDebug() << l;
+    qDebug() << "\n\n\n";
+   */ QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
 
     completerModel->setStringList(l);
+
     this->PopupCompleter();
-   /* completer->model()->set
-    completer->popup()->selectionModel()->select(completer->completionModel()->index(0,0), QItemSelectionModel::Select
-       );*/
 }
 
 void CEditorPage::insertCompletion(QString completion)
 {
     if (completer->widget() != this)
-    {
         return;
-    }
 
     QTextCursor tc = textCursor();
     tc.select(QTextCursor::WordUnderCursor);
 
-    /*int remaining = completion.size() - completer->completionPrefix().size();
-*/
-    /*QString prefix = completer->completionPrefix();
-    while (completion[i] == prefix[i])
-        tc.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
-*/
-    tc.insertText(completion);//.right(remaining));
+    tc.insertText(completion);
 
     setTextCursor(tc);
 }
 
-QString CEditorPage::textUnderCursor() const
+QString CEditorPage::textUnderCursor(int moveLeft) const
 {
     QTextCursor tc = textCursor();
+
+    if (moveLeft > 0)
+        tc.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, moveLeft);
+
     tc.select(QTextCursor::WordUnderCursor);
 
     return tc.selectedText();
@@ -178,10 +174,10 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
        }
     }
 
-    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
-    if (!completer || !isShortcut) // dont process the shortcut when we have a completer
-        QPlainTextEdit::keyPressEvent(e);
+ //   bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+ /*   if (!completer || !isShortcut) // dont process the shortcut when we have a completer
 
+*/        QPlainTextEdit::keyPressEvent(e);
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     if (!completer || (ctrlOrShift && e->text().isEmpty()))
         return;
@@ -190,33 +186,24 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
      bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
      QString completionPrefix = textUnderCursor();
 
-     QString text = this->toPlainText();
-     QTextCursor cursor = this->textCursor();
+     if (eow.contains(completionPrefix))
+     {
+         completionPrefix = textUnderCursor(1);
+     }
+
+     qDebug() << completionPrefix;
 
      this->completer->setCompletionMode(QCompleter::PopupCompletion);
-     if (cursor.position() > 0 && cursor.position() <= text.size())
-     {
-         if (
-                 (text[cursor.position() - 1] == '.')
-                 ||
-                 ((cursor.position() > 1 && text[cursor.position() - 2] == '-' && text[cursor.position() - 1] == '>'))
-         )
-         {
-             this->completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-             completionPrefix = "";
-             //this->parser->GenerateCompleterSuggestions();
-             //return;
-         }
 
-     }
-    qDebug() << completionPrefix;
-     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1
-                       /*|| eow.contains(e->text().right(1))*/)) {
+     if (/*!isShortcut && */(hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1
+                       /*|| eow.contains(e->text().right(1))*/))
+     {
          completer->popup()->hide();
          return;
      }
 
-     if (completionPrefix != completer->completionPrefix()) {
+     if (completionPrefix != completer->completionPrefix())
+     {
          completer->setCompletionPrefix(completionPrefix);
          completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
      }
@@ -227,5 +214,5 @@ void CEditorPage::PopupCompleter()
 {
     QRect cr = cursorRect();
     cr.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
-    completer->complete(cr); // popup it up!
+    completer->complete(cr);
 }
