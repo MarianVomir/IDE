@@ -79,7 +79,9 @@ void CEditorPage::mouseMoveEvent(QMouseEvent* e)
 
 void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
 {
+    this->document()->blockSignals(true);
     this->blockSignals(true);
+
     // stop this text page from emitting any signals
     // what we are interested in is to not emit textChanged() when setting the text format
 
@@ -114,7 +116,9 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
     this->setTextCursor(c);
 
     this->verticalScrollBar()->setValue(verticalScrollBarValue);
+
     this->blockSignals(false);
+    this->document()->blockSignals(false);
 }
 
 void CEditorPage::SetCompletionModel(QStringList l)

@@ -18,12 +18,10 @@ void TextChangeCommand::redo()
     doc->blockSignals(true);
     textEdit->blockSignals(true);
 
-    QTextCursor c = textEdit->textCursor();
     QString text = doc->toPlainText();
     text.remove(from, removed.length()); // remove text (can be empty)
-    text.insert(from, added);           // add text (can be empty)
+    text.insert(from, added);            // add text (can be empty)
     doc->setPlainText(text);
-    textEdit->setTextCursor(c);
 
     textEdit->blockSignals(false);
     doc->blockSignals(false);
@@ -36,12 +34,10 @@ void TextChangeCommand::undo()
     doc->blockSignals(true);
     textEdit->blockSignals(true);
 
-    QTextCursor c = textEdit->textCursor();
     QString text =  doc->toPlainText();
     text.remove(from, added.length());  // remove added text (can be empty)
     text.insert(from, removed);         // re-insert removed text (can be empty)
     doc->setPlainText(text);
-    textEdit->setTextCursor(c);
 
     textEdit->blockSignals(false);
     doc->blockSignals(false);

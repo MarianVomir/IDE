@@ -8,12 +8,10 @@ CParser::CParser(const CEditorPage* textEdit)
     timer = new QTimer();
     timer->setSingleShot(true);
 
-    connect(textEdit, SIGNAL(textChanged()), this, SLOT(ActivateTimer()));
+    connect(textEdit->document(), SIGNAL(contentsChanged()), this, SLOT(ActivateTimer()));
     connect(timer, SIGNAL(timeout()), this, SLOT(Parse()));
     connect(this, SIGNAL(DiagnosticsReady(std::vector<DiagnosticDTO>)), this->textEdit, SLOT(ShowDiagnostics(std::vector<DiagnosticDTO>)));
     connect(this, SIGNAL(CompletionSuggestionsReady(QStringList)), this->textEdit, SLOT(SetCompletionModel(QStringList)));
-
-
 }
 
 void CParser::ActivateTimer()
