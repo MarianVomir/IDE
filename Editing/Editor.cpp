@@ -359,6 +359,7 @@ void Editor::CloseTab(int index)
     if (filePath != "" && saved && onDisk)
     {
         watcher->removePath(page->property("filePath").toString());
+        disconnect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
         delete page;
     }
     else if (filePath != "" && !saved)
@@ -383,6 +384,7 @@ void Editor::CloseTab(int index)
             }
 
             watcher->removePath(page->property("filePath").toString());
+            disconnect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
             delete page;
         }
         catch (FileSystemException& ex)
@@ -408,6 +410,7 @@ void Editor::CloseTab(int index)
                     QFileInfo info(file);
                     FileManager::WriteFile(info.absoluteFilePath(), page->toPlainText());
 
+                    disconnect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
                     delete page;
                 }
                 catch (FileSystemException& ex)
@@ -426,6 +429,7 @@ void Editor::CloseTab(int index)
         }
         else
         {
+            disconnect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
             delete page;
         }
     }

@@ -28,6 +28,7 @@ CEditorPage::CEditorPage()
 
     undoStack.setUndoLimit(300);
     connect(this->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(contentsChanged(int,int,int)));
+    undoStack.clear();
 }
 
 CEditorPage::~CEditorPage()
@@ -171,7 +172,7 @@ void CEditorPage::contentsChanged(int from, int removed, int added)
     currentText = document()->toPlainText();
     QString addedText = currentText.mid(from, added);
 
-    TextChangeCommand* cmd = new TextChangeCommand(from, removedText, addedText, this);
+    TextChangeCommand* cmd = new TextChangeCommand(from, removedText, addedText, this, highlighter);
     qDebug() << " PUSHED " << from << " " << removedText << " " << addedText;
     undoStack.push(cmd);
 }

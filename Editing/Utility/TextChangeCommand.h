@@ -5,6 +5,7 @@
 #include <QTextDocument>
 #include <QDebug>
 #include <QPlainTextEdit>
+#include <QSyntaxHighlighter>
 
 class TextChangeCommand : public QUndoCommand
 {
@@ -14,11 +15,12 @@ private:
     QString added;
     QTextDocument* doc;
     QPlainTextEdit* textEdit;
+    QSyntaxHighlighter* highlighter;
 
     bool firstTime;
 
 public:
-    TextChangeCommand(int from, const QString& removed, const QString& added, QPlainTextEdit *textEdit);
+    TextChangeCommand(int from, const QString& removed, const QString& added, QPlainTextEdit *textEdit, QSyntaxHighlighter* highlighter);
     ~TextChangeCommand();
 
     virtual void undo();
