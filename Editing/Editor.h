@@ -10,6 +10,7 @@
 
 #include "EditorPageFactory.h"
 #include "FileManager.h"
+#include "Global.h"
 
 class Editor : QWidget
 {
@@ -18,6 +19,7 @@ class Editor : QWidget
 private:
     QTabWidget* tabWidget;
     QFileSystemWatcher* watcher;
+    QFileDialog* fileDialog;
 
     QString GetFileExtension(const QString &filePath);
 

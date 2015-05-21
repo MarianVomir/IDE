@@ -20,15 +20,22 @@ void TextChangeCommand::redo()
 
     QString text = doc->toPlainText();
     text.remove(from, removed.length()); // remove text (can be empty)
-    text.insert(from, added);            // add text (can be empty)
+    text.insert(from, added);             // add text (can be empty)
+
+    int cursorPos = from;// + added.length() - 1;
+
     doc->setPlainText(text);
 
     highlighter->rehighlight();
 
+    QTextCursor cursor = textEdit->textCursor();
+    cursor.setPosition(cursorPos);
+    textEdit->setTextCursor(cursor);
+
     textEdit->blockSignals(false);
     doc->blockSignals(false);
 
-    qDebug() << "Executed redo: " << from << " " << removed << " " << added;
+    //qDebug() << "Executed redo: " << from << " " << removed << " " << added;
 }
 
 void TextChangeCommand::undo()
@@ -41,11 +48,18 @@ void TextChangeCommand::undo()
     text.insert(from, removed);         // re-insert removed text (can be empty)
     doc->setPlainText(text);
 
+    int cursorPos = from;// + added.length() - 1;
+
     highlighter->rehighlight();
+
+    QTextCursor cursor = textEdit->textCursor();
+    cursor.setPosition(cursorPos);
+    textEdit->setTextCursor(cursor);
+
     textEdit->blockSignals(false);
     doc->blockSignals(false);
 
-    qDebug() << "Executed undo: " << from << " " << removed << " " << added;
+    //qDebug() << "Executed undo: " << from << " " << removed << " " << added;
 }
 
 TextChangeCommand::~TextChangeCommand()

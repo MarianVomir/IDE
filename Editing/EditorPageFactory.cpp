@@ -16,15 +16,15 @@ EditorPageFactory::~EditorPageFactory()
     }
 }
 
-EditorPage* EditorPageFactory::CreateEditorPage(const QString &fileExtension)
+EditorPage* EditorPageFactory::CreateEditorPage(const QString &fileExtension, void *args)
 {
     if (creators.contains(fileExtension)) // supported extension, call the appropriate page creator
     {
-        return creators[fileExtension]->CreateEditorPage();
+        return creators[fileExtension]->CreateEditorPage(args);
     }
     else // default page, either no file extension or unsupported extension
     {
-        return creators[""]->CreateEditorPage();
+        return creators[""]->CreateEditorPage(args);
     }
 }
 

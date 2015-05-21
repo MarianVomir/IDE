@@ -3,7 +3,6 @@
 
 #include <QUndoCommand>
 #include <QTextDocument>
-#include <QDebug>
 #include <QPlainTextEdit>
 #include <QSyntaxHighlighter>
 

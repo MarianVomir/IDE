@@ -4,12 +4,13 @@
 #include <QJsonObject>
 
 #include "Project.h"
+#include "GUI/VisualStyles.h"
 
 class Global
 {
 public:
     static QJsonObject defaultProjectValues;
-    // visual styles
+    static VisualStyles Visual;
 
 public:
     Global();

@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QFileDialog>
-#include <QDebug>
 #include <QCompleter>
 #include <QDirModel>
 #include <QMessageBox>
@@ -39,6 +38,8 @@ private:
     ProjectFileConverter* converter;
     Project* project;
     QString projFilePath;
+    QFileDialog* fileDialog;
+
 };
 
 #endif // OPENPROJECTDIALOG_H

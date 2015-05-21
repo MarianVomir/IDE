@@ -31,6 +31,8 @@
 #include "openprojectdialog.h"
 #include "settingsdialog.h"
 
+#include "Global.h"
+
 namespace Ui {
     class MainWindow;
 }
@@ -93,6 +95,8 @@ private:
     ProjectBuilder* projectBuilder;
     OutputWriter* outputWriter;
     ProjectRunner* projectRunner;
+
+    QFileDialog* fileDialog;
 
 public:
     void OnNewProject();

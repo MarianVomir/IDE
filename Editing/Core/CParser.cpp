@@ -188,31 +188,34 @@ void CParser::GenerateCompleterSuggestions()
     int line = cursor.blockNumber() + 1;
     cursor.setPosition(oldCursorPos);
 
-    if (line != 0 && col != 0)
+    if (line > 0 && col > 0)
     {
         auto completions = clang_codeCompleteAt(translationUnit, fileName, line, col, unsavedFiles, 1, clang_defaultCodeCompleteOptions());
 
-        for (auto i = 0u; i < completions->NumResults; ++i)
+        if (completions != NULL)
         {
-            auto& completionString = completions->Results[i].CompletionString;
-
-            for (auto j = 0u; j < clang_getNumCompletionChunks(completionString); ++j)
+            for (auto i = 0u; i < completions->NumResults; ++i)
             {
-                auto chunkType = clang_getCompletionChunkKind(completionString, j);
+                auto& completionString = completions->Results[i].CompletionString;
 
-                if (chunkType == CXCompletionChunk_TypedText)
+                for (auto j = 0u; j < clang_getNumCompletionChunks(completionString); ++j)
                 {
-                    auto chunkString = clang_getCompletionChunkText(completionString, j);
-                    const char* completionItem = clang_getCString(chunkString);
+                    auto chunkType = clang_getCompletionChunkKind(completionString, j);
 
-                    this->AddToCompletionList(completionItem);
+                    if (chunkType == CXCompletionChunk_TypedText)
+                    {
+                        auto chunkString = clang_getCompletionChunkText(completionString, j);
+                        const char* completionItem = clang_getCString(chunkString);
 
-                    clang_disposeString(chunkString);
+                        this->AddToCompletionList(completionItem);
+
+                        clang_disposeString(chunkString);
+                    }
                 }
             }
-        }
 
         clang_disposeCodeCompleteResults(completions);
+        }
     }
 
 

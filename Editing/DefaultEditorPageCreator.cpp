@@ -10,7 +10,7 @@ DefaultEditorPageCreator::~DefaultEditorPageCreator()
 
 }
 
-EditorPage *DefaultEditorPageCreator::CreateEditorPage()
+EditorPage *DefaultEditorPageCreator::CreateEditorPage(void *args)
 {
     return new DefaultEditorPage();
 }

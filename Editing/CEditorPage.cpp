@@ -1,10 +1,9 @@
 #include "CEditorPage.h"
 
-CEditorPage::CEditorPage()
+CEditorPage::CEditorPage(const QString& contents)
 {
     highlighter = new CSyntaxHighlighter(this->document());
     completer = new QCompleter(this);
-    parser = new CParser(this);
 
     completer->setWidget(this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -22,13 +21,19 @@ CEditorPage::CEditorPage()
     errorFormat.setFontWeight(QFont::Bold);
     errorFormat.setFontUnderline(true);
     errorFormat.setUnderlineColor(QColor(255, 0, 0));
-    standardFormat.setForeground(QBrush(QColor(0, 0, 0)));
-    warningFormat.setFontUnderline(true);
-    warningFormat.setUnderlineColor(QColor(255, 255, 0));
+    errorFormat.setBackground(QBrush(QColor(255,35,35)));
 
+    standardFormat.setForeground(QBrush(Global::Visual.NormalTextColor));
+    warningFormat.setFontUnderline(true);
+    warningFormat.setUnderlineColor(QColor(255, 175, 50));
+    warningFormat.setBackground(QBrush(QColor(240, 170, 0)));
+
+    this->setPlainText(contents);
     undoStack.setUndoLimit(300);
-    connect(this->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(contentsChanged(int,int,int)));
     undoStack.clear();
+    connect(this->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(contentsChanged(int,int,int)));
+
+    parser = new CParser(this);
 }
 
 CEditorPage::~CEditorPage()
@@ -73,7 +78,7 @@ void CEditorPage::DisplayTooltipForDiagnosticUnderCursor()
 void CEditorPage::mouseMoveEvent(QMouseEvent* e)
 {
     QTextCursor cursor = cursorForPosition(e->pos());
-    DisplayTooltip(cursor, this->mapToGlobal(e->pos()));
+    DisplayTooltip(cursor, this->mapToGlobal(e->pos() + QPoint(0, -50)));
 
     QPlainTextEdit::mouseMoveEvent(e);
 }
@@ -124,9 +129,7 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
 
 void CEditorPage::SetCompletionModel(QStringList l)
 {
- /*   qDebug() << l;
-    qDebug() << "\n\n\n";
-   */ QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
+    QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
 
     completerModel->setStringList(l);
 
@@ -173,7 +176,7 @@ void CEditorPage::contentsChanged(int from, int removed, int added)
     QString addedText = currentText.mid(from, added);
 
     TextChangeCommand* cmd = new TextChangeCommand(from, removedText, addedText, this, highlighter);
-    qDebug() << " PUSHED " << from << " " << removedText << " " << addedText;
+    //qDebug() << " PUSHED " << from << " " << removedText << " " << addedText;
     undoStack.push(cmd);
 }
 
@@ -208,6 +211,8 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
         {
             if (undoStack.canUndo())
                 undoStack.undo();
+            /*else
+                this->document()->setModified(false);*/
             return;
         }
         else if (e->key() == Qt::Key_Y) // ctrl-Y -> redo
@@ -219,37 +224,40 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
     }
     /** End of UNDO REDO FRAMEWORK **/
 
-    QPlainTextEdit::keyPressEvent(e);
+    //QPlainTextEdit::keyPressEvent(e);
+
+    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space); // CTRL+Space
+    if (!completer || !isShortcut)
+        QPlainTextEdit::keyPressEvent(e);
 
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     if (!completer || (ctrlOrShift && e->text().isEmpty()))
         return;
 
-     static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
-     bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
-     QString completionPrefix = textUnderCursor();
+    static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+    bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+    QString completionPrefix = textUnderCursor();
 
-     if (eow.contains(completionPrefix))
-     {
-         completionPrefix = textUnderCursor(1);
-     }
+    if (eow.contains(completionPrefix))
+    {
+        completionPrefix = textUnderCursor(1);
+    }
 
-     this->completer->setCompletionMode(QCompleter::PopupCompletion);
+    this->completer->setCompletionMode(QCompleter::PopupCompletion);
 
-     if (/*!isShortcut && */(hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1
-                       /*|| eow.contains(e->text().right(1))*/))
-     {
-         completer->popup()->hide();
-         return;
-     }
+    if (/*!isShortcut && (eow.contains(e->text().right(1)) ||*/ hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1)
+    {
+        completer->popup()->hide();
+        return;
+    }
 
-     if (completionPrefix != completer->completionPrefix())
-     {
-         completer->setCompletionPrefix(completionPrefix);
-         completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
-     }
+    if (completionPrefix != completer->completionPrefix())
+    {
+        completer->setCompletionPrefix(completionPrefix);
+        completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+    }
 
-     parser->GenerateCompleterSuggestions();
+    parser->GenerateCompleterSuggestions();
 }
 
 void CEditorPage::PopupCompleter()

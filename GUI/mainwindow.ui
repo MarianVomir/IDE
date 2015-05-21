@@ -318,7 +318,7 @@
     <string>Toggle the visibility of Project Explorer.</string>
    </property>
    <property name="shortcut">
-    <string>Alt+1</string>
+    <string>Ctrl+1</string>
    </property>
   </action>
   <action name="actionOutputWindow">
@@ -335,7 +335,7 @@
     <string>Toggle the visibility of the Output Window.</string>
    </property>
    <property name="shortcut">
-    <string>Alt+2</string>
+    <string>Ctrl+2</string>
    </property>
   </action>
   <action name="actionOpen_Settings">

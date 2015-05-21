@@ -6,7 +6,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-   // statusBar()->hide();
+    fileDialog = new QFileDialog(this);
+
+    statusBar()->hide();
+    ui->mainToolBar->hide();
+
+    ui->centralWidget->setStyleSheet(Global::Visual.WindowStyle);
+    ui->outputWindow->setStyleSheet(Global::Visual.WindowStyle);
+    ui->projectTree->setStyleSheet(Global::Visual.WindowStyle);
+    ui->tabEditor->setStyleSheet(Global::Visual.WindowStyle);
+
     QList<int> sizes;
     sizes.append(200);
     sizes.append(900);
@@ -42,10 +51,11 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete editor;
-
     delete projectExplorer;
     delete converter;
     delete projectBuilder;
+    delete fileDialog;
+
     delete ui;
 }
 
@@ -63,7 +73,7 @@ void MainWindow::SetNewProject(Project *project)
     if (FileManager::Exists(project->Root()) && FileManager::IsDir(project->Root())) // projectDir.exists())
     {
         QMessageBox::StandardButton answer = QMessageBox::question(
-                 NULL,
+                 this,
                  "Warning",
                  "Directory already exists, files may be overridden, create project?",
                  QMessageBox::Yes | QMessageBox::No
@@ -138,7 +148,7 @@ void MainWindow::on_actionRefreshProjectExplorer_triggered()
 }
 void MainWindow::on_actionOpen_File_triggered()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, "Open File(s)", QDir::homePath());
+    QStringList files = fileDialog->getOpenFileNames(this, "Open File(s)", QDir::homePath());
     for (int i = 0; i < files.size(); i++)
     {
         try
@@ -147,7 +157,7 @@ void MainWindow::on_actionOpen_File_triggered()
         }
         catch (FileSystemException& ex)
         {
-            QMessageBox::warning(NULL, "Cannot read file", ex.Message());
+            QMessageBox::warning(this, "Cannot read file", ex.Message());
         }
     }
 }

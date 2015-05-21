@@ -8,7 +8,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
 
     // NORMAL FONT
     QTextCharFormat normalFormat;
-    normalFormat.setForeground(Qt::black);
+    normalFormat.setForeground(Global::Visual.NormalTextColor);
     normalFormat.setFontItalic(false);
     normalFormat.setFontWeight(QFont::Normal);
     rule.format = normalFormat;
@@ -16,7 +16,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // FUNCTIONS
-    functionFormat.setForeground(QBrush(QColor(100, 0, 128)));
+    functionFormat.setForeground(QBrush(QColor(60, 225, 15)));
     functionFormat.setFontWeight(QFont::Bold);
     pattern = functionPattern;
     rule.pattern = QRegExp(pattern);
@@ -24,7 +24,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // KEYWORDS
-    keywordFormat.setForeground(QBrush(QColor(30, 80, 50)));
+    keywordFormat.setForeground(QBrush(QColor(225, 140, 15)));
     keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
 
@@ -41,7 +41,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     }
 
     // PREPROCESSOR DIRECTIVES
-    preprocessFormat.setForeground(QBrush(QColor(0, 60, 90)));
+    preprocessFormat.setForeground(QBrush(QColor(235, 30, 110)));
 
     for (auto& directive : CpreprocessDirectives)
     {
@@ -53,7 +53,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     }
 
     // SINGLE LINE COMMENTS
-    singleLineCommentFormat.setForeground(QBrush(QColor(0x80, 0x80, 0x80)));
+    singleLineCommentFormat.setForeground(QBrush(QColor(150, 5, 235)));
     rule.format = singleLineCommentFormat;
     pattern = singleLineCommentPattern;
     rule.pattern = QRegExp(pattern);
@@ -68,7 +68,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     commentEndExpression = QRegExp(commentEndPattern);
 
     // STRING LITERALS
-    stringLiteralFormat.setForeground(QBrush(QColor(255, 128, 128)));
+    stringLiteralFormat.setForeground(QBrush(QColor(120, 135, 225)));
     stringLiteralFormat.setFontWeight(QFont::Bold);
     pattern = stringLiteralPattern;
     rule.pattern = QRegExp(pattern);
@@ -76,7 +76,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // CHAR LITERALS
-    charLiteralFormat.setForeground(QBrush(QColor(255, 128, 255)));
+    charLiteralFormat.setForeground(QBrush(QColor(50, 70, 155)));
     charLiteralFormat.setFontWeight(QFont::Bold);
     pattern = charLiteralPattern;
     rule.pattern = QRegExp(pattern);
@@ -85,7 +85,6 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
 }
 void CSyntaxHighlighter::highlightBlock(const QString &text)
 {
-   // qDebug() << text;
     static int NORMAL_STATE = 0;
     static int INSIDE_MULTILINE_COMMENT = 1;
     static int INSIDE_MULTILINE_MACRO = 2;
@@ -117,13 +116,7 @@ void CSyntaxHighlighter::highlightBlock(const QString &text)
     }
     else if (previousBlockState() != INSIDE_MULTILINE_MACRO)
     {
-    //    macroStartIndex = preprocessFormat.indexIn(text);
     }
-    /*
-    while (macroStartIndex >= 0)
-    {
-        int macroEndIndex = QRegExp("")
-    }*/
 
     while (startIndex >= 0) // if start of multiline comment found
     {

@@ -9,7 +9,7 @@ class DefaultEditorPageCreator : public EditorPageCreator
 public:
     DefaultEditorPageCreator();
     ~DefaultEditorPageCreator();
-    virtual EditorPage* CreateEditorPage();
+    virtual EditorPage* CreateEditorPage(void* args);
 };
 
 #endif // DEFAULTEDITORPAGECREATOR_H

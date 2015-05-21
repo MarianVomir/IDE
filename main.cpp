@@ -1,15 +1,12 @@
-#include "GUI/mainwindow.h"
-#include "Mediator.h"
-#include "ProjectManagement/JSONConverter.h"
-#include "Editing/EditorPageFactory.h"
-
-#include "GUI/settingsdialog.h"
-
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
 
+#include "GUI/mainwindow.h"
+#include "ProjectManagement/JSONConverter.h"
+#include "Editing/EditorPageFactory.h"
+#include "GUI/settingsdialog.h"
 #include "Testing/Tester_FileManager.h"
 
 int main(int argc, char *argv[])
@@ -24,7 +21,7 @@ int main(int argc, char *argv[])
     {
         SettingsManager::LoadProjectDefaults();
     }
-    catch (Exception& e)
+    catch (Exception&)
     {
         qDebug() << "Cannot load default project settings from file.";
     }
@@ -32,5 +29,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.showMaximized();
+    //w.setStyleSheet(Global::Visual.WindowStyle);
     return a.exec();
 }

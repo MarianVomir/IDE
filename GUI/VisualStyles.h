@@ -1,14 +1,22 @@
 #ifndef VISUALSTYLES_H
 #define VISUALSTYLES_H
 
+#include <QString>
+#include <QColor>
+
 class VisualStyles
 {
-private:
-    VisualStyles();
-
 public:
+    VisualStyles();
     ~VisualStyles();
-/*
+
+    QString WindowStyle;
+    QColor NormalTextColor;
+    QColor CurrentLineColor;
+    QColor LineNumberAreaBackground;
+    QColor LineNumberAreaForeground;
+
+    /*
     Default: dark style
         - dark grey background
         - yellow-ish foreground

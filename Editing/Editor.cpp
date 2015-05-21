@@ -3,6 +3,9 @@
 Editor::Editor(QTabWidget *tabWidget)
     : tabWidget(tabWidget)
 {
+    fileDialog = new QFileDialog(this);
+    fileDialog->setStyleSheet(Global::Visual.WindowStyle);
+
     while (tabWidget->count()) delete tabWidget->widget(0);
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
 
@@ -21,6 +24,7 @@ Editor::~Editor()
     disconnect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
 
     delete watcher;
+    delete fileDialog;
 }
 
 bool Editor::AskSaveAll()
@@ -174,11 +178,11 @@ EditorPage* Editor::CreateTab(const QString& filePath)
         fileContents = FileManager::ReadFile(filePath);
     }
 
-    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension);
+    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, &fileContents);
     if (page == NULL)
         return NULL;
 
-    page->setPlainText(fileContents);
+    //page->setPlainText(fileContents);
 
     page->setProperty("filePath", info.absoluteFilePath());
     page->setProperty("fileName", info.fileName());
@@ -186,7 +190,7 @@ EditorPage* Editor::CreateTab(const QString& filePath)
     page->setProperty("onDisk", true);
 
     //connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
-    connect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
+
     return page;
 }
 
@@ -196,7 +200,7 @@ void Editor::CreateBlankTab()
     QString fileName = "(Unsaved)";
     QString fileContents = "";
 
-    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension); // create default page
+    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, NULL); // create default page
     if (page == NULL)
         return;
 
@@ -207,9 +211,10 @@ void Editor::CreateBlankTab()
 
     page->setPlainText(fileContents);
 
-    connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
+    //connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
 
     int index = tabWidget->addTab(page, "");
+
     tabWidget->setTabText(index, page->property("fileName").toString() + "*");
     tabWidget->setCurrentIndex(index);
     page->setFocus();
@@ -293,7 +298,8 @@ bool Editor::SaveFileAs()
     if (page == NULL)
         return false;
 
-    QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
+    QString file = fileDialog->getSaveFileName(this, "Save File As...", QDir::homePath(), "", 0, QFileDialog::DontUseNativeDialog);
+
     if (file != "")
     {
         try
@@ -329,6 +335,7 @@ bool Editor::SaveFileAs()
                 watcher->addPath(info.absoluteFilePath());
             }
 
+            connect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
             page->setFocus();
 
             return true;
@@ -402,7 +409,7 @@ void Editor::CloseTab(int index)
         int answer = box.exec();
         if (answer == QMessageBox::Save)
         {
-            QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
+            QString file = fileDialog->getSaveFileName(this, "Save File As...", QDir::homePath());
             if (file != "")
             {
                 try

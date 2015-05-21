@@ -9,7 +9,7 @@ class CEditorPageCreator : public EditorPageCreator
 public:
     CEditorPageCreator();
     ~CEditorPageCreator();
-    virtual EditorPage* CreateEditorPage();
+    virtual EditorPage* CreateEditorPage(void *args);
 };
 
 #endif // CEDITORPAGECREATOR_H

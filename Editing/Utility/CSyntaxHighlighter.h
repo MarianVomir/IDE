@@ -5,8 +5,8 @@
 #include <QTextCharFormat>
 #include <QVector>
 #include <QSyntaxHighlighter>
-#include <QDebug>
 
+#include "Global.h"
 #include "CLexic.h"
 
 // Implemented based on the tutorial found at: http://doc.qt.digia.com/4.6/richtext-syntaxhighlighter.html

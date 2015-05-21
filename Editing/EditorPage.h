@@ -8,6 +8,8 @@
 #include <QTextBlock>
 #include <QPair>
 
+#include "Global.h"
+
 class LineNumberArea; // forward declaration because we have circular dependency
 #include "Editing/Utility/LineNumberArea.h"
 

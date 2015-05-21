@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Settings</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
@@ -25,11 +28,6 @@
    <property name="currentIndex">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="generalTab">
-    <attribute name="title">
-     <string>General</string>
-    </attribute>
-   </widget>
    <widget class="QWidget" name="projectTab">
     <attribute name="title">
      <string>Project</string>
