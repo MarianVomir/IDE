@@ -243,6 +243,8 @@ void Editor::OpenFile(const QString &filePath)
     int index = tabWidget->addTab(page, QFileInfo(filePath).fileName());
     tabWidget->setTabText(index, page->property("fileName").toString());
     tabWidget->setCurrentIndex(index);
+
+    connect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
     page->setFocus();
 
     watcher->addPath(page->property("filePath").toString());
