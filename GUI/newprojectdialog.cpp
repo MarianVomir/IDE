@@ -56,12 +56,16 @@ void NewProjectDialog::OnPathChanged(QString s)
         ui->lbl_ProjectRoot->setText(QString("Project name must not contain spaces or slashes!"));
         ui->btn_OK->setEnabled(false);
     }
-    else if (!containingFolder.startsWith("/"))
+    else
+
+    #ifdef __linux__
+    if (!containingFolder.startsWith("/"))
     {
         ui->lbl_ProjectRoot->setText(QString("Containing folder path must be absolute (Must start with '/')"));
         ui->btn_OK->setEnabled(false);
     }
     else
+    #endif
     {
         ui->txt_ContainingFolder->setText(containingFolder);
         containingFolder.replace('\\', '/');
