@@ -13,8 +13,10 @@ class DefaultEditorPage : public EditorPage
 private:
 
 public:
-    DefaultEditorPage(QWidget* parent = 0);
+    DefaultEditorPage(const QString &contents);
     virtual ~DefaultEditorPage();
+
+    void keyPressEvent(QKeyEvent* e);
 };
 
 #endif // DEFAULTEDITORPAGE_H

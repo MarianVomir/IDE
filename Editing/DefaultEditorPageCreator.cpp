@@ -12,6 +12,7 @@ DefaultEditorPageCreator::~DefaultEditorPageCreator()
 
 EditorPage *DefaultEditorPageCreator::CreateEditorPage(void *args)
 {
-    return new DefaultEditorPage();
+    QString* contents = static_cast<QString*>(args);
+    return new DefaultEditorPage(*contents);
 }
 
