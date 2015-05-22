@@ -16,7 +16,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     // FUNCTIONS
-    functionFormat.setForeground(QBrush(QColor(60, 225, 15)));
+    functionFormat.setForeground(QBrush(QColor(50, 175, 20)));
     functionFormat.setFontWeight(QFont::Bold);
     pattern = functionPattern;
     rule.pattern = QRegExp(pattern);
