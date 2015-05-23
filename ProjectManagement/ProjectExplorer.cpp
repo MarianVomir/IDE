@@ -133,7 +133,8 @@ void ProjectExplorer::SetTree(QTreeView* tree)
     if (this->projectTree != NULL)
     {
         //this->projectTree->setDragDropMode(QAbstractItemView::NoDragDrop);
-        this->projectTree->setEditTriggers(QTreeView::NoEditTriggers);
+      //  this->projectTree->setEditTriggers(QTreeView::NoEditTriggers);
+        this->projectTree->setEditTriggers(QTreeView::AnyKeyPressed);
         connect(this->projectTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(OnProjectTreeRightClick(QPoint)));
     }
 }

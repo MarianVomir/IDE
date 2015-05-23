@@ -113,7 +113,7 @@ void CParser::Parse()
                 if (offset > 0)
                     offset--;
 
-            static char separators[] = " \n\r[];(){}=<>*+-\0";
+            static char separators[] = " ,\n\r[];(){}=<>*+-\0";
             if (offset < len && (text[offset] == '\n' || text[offset] == '\r'))
                 offset--;
 

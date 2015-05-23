@@ -224,8 +224,6 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
     }
     /** End of UNDO REDO FRAMEWORK **/
 
-    //QPlainTextEdit::keyPressEvent(e);
-
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space); // CTRL+Space
     if (!completer || !isShortcut)
         QPlainTextEdit::keyPressEvent(e);
@@ -245,7 +243,7 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
 
     this->completer->setCompletionMode(QCompleter::PopupCompletion);
 
-    if (/*!isShortcut && (eow.contains(e->text().right(1)) ||*/ hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1)
+    if (e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backspace || /*!isShortcut && (eow.contains(e->text().right(1)) ||*/ hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1)
     {
         completer->popup()->hide();
         return;

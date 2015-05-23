@@ -200,7 +200,7 @@ void Editor::CreateBlankTab()
     QString fileName = "(Unsaved)";
     QString fileContents = "";
 
-    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, NULL); // create default page
+    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, &fileContents); // create default page with no text
     if (page == NULL)
         return;
 
@@ -234,6 +234,7 @@ void Editor::OpenFile(const QString &filePath)
         if (path == filePath)
         {
             tabWidget->setCurrentIndex(i);
+            tabWidget->widget(i)->setFocus();
             return;
         }
     }
