@@ -41,7 +41,7 @@ int OpenProjectDialog::exec()
         bool fileHasBeenSelected = false;
         while (1)
         {
-            projFilePath = fileDialog.getOpenFileName(NULL, "Select Project File", "", "Project files (*.proj)");
+            projFilePath = fileDialog.getOpenFileName(this, "Select Project File", QDir::homePath(), "Project files (*.proj)");
             if (projFilePath.size() > 0)
             {
                 QFileInfo info(projFilePath);
