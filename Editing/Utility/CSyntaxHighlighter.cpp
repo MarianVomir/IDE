@@ -8,7 +8,7 @@ CSyntaxHighlighter::CSyntaxHighlighter(QTextDocument *parent)
 
     // NORMAL FONT
     QTextCharFormat normalFormat;
-    normalFormat.setForeground(Global::Visual.NormalTextColor);
+   // normalFormat.setForeground(Global::Visual.NormalTextColor);
     normalFormat.setFontItalic(false);
     normalFormat.setFontWeight(QFont::Normal);
     rule.format = normalFormat;

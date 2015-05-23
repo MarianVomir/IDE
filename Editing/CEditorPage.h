@@ -45,6 +45,7 @@ public slots:
 public:
     CEditorPage(const QString& contents);
     ~CEditorPage();
+    void PerformAfterSetupOperations();
 
 protected:
     void keyPressEvent(QKeyEvent* e);

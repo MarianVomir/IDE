@@ -23,7 +23,7 @@ CEditorPage::CEditorPage(const QString& contents)
     errorFormat.setUnderlineColor(QColor(255, 0, 0));
     errorFormat.setBackground(QBrush(QColor(255,35,35)));
 
-    standardFormat.setForeground(QBrush(Global::Visual.NormalTextColor));
+    //standardFormat.setForeground(QBrush(Global::Visual.NormalTextColor));
     warningFormat.setFontUnderline(true);
     warningFormat.setUnderlineColor(QColor(255, 175, 50));
     warningFormat.setBackground(QBrush(QColor(240, 170, 0)));
@@ -42,6 +42,12 @@ CEditorPage::~CEditorPage()
     delete highlighter;
     delete completer;
     delete parser;
+}
+
+void CEditorPage::PerformAfterSetupOperations()
+{
+    if (this->parser != NULL)
+        this->parser->Parse();
 }
 
 void CEditorPage::DisplayTooltip(const QTextCursor& cursor, const QPoint& point)
@@ -129,8 +135,6 @@ void CEditorPage::ShowDiagnostics(std::vector<DiagnosticDTO> diags)
 
 void CEditorPage::SetCompletionModel(QStringList l)
 {
-    QMutexLocker lock(&mtx_CompleterModelIsBeingAccessed);
-
     completerModel->setStringList(l);
 
     this->PopupCompleter();
@@ -243,7 +247,7 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
 
     this->completer->setCompletionMode(QCompleter::PopupCompletion);
 
-    if (e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backspace || /*!isShortcut && (eow.contains(e->text().right(1)) ||*/ hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1)
+    if (e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backspace || hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1) /*!isShortcut && (eow.contains(e->text().right(1)) ||*/
     {
         completer->popup()->hide();
         return;

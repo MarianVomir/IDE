@@ -35,7 +35,7 @@ private slots:
 
 private:
     EditorPage* CreateTab(const QString& filePath);
-    void CreateBlankTab();
+    EditorPage *CreateBlankTab();
     int GetTabContainingFile(const QString& filePath);
 
 public slots:

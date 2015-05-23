@@ -26,6 +26,8 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent* event);
     int lineNumberAreaWidth();
 
+    virtual void PerformAfterSetupOperations() = 0;
+
 protected:
     void resizeEvent(QResizeEvent *);
 

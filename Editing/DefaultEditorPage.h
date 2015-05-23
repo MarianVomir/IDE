@@ -16,6 +16,7 @@ public:
     DefaultEditorPage(const QString &contents);
     virtual ~DefaultEditorPage();
 
+    void PerformAfterSetupOperations();
     void keyPressEvent(QKeyEvent* e);
 };
 

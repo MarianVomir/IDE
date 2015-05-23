@@ -4,11 +4,14 @@ CParser::CParser(const CEditorPage* textEdit)
 {
     this->textEdit = textEdit;
 
+    QMutexLocker lock(&clangMutex);
     index = clang_createIndex(0,0);
     timer = new QTimer();
     timer->setSingleShot(true);
 
-    connect(textEdit->document(), SIGNAL(contentsChanged()), this, SLOT(ActivateTimer()));
+    translationUnitHasBeenParsed = false;
+
+    connect(textEdit/*->document()*/, /* SIGNAL(contentsChanged())*/ SIGNAL(textChanged()), this, SLOT(ActivateTimer()));
     connect(timer, SIGNAL(timeout()), this, SLOT(Parse()));
     connect(this, SIGNAL(DiagnosticsReady(std::vector<DiagnosticDTO>)), this->textEdit, SLOT(ShowDiagnostics(std::vector<DiagnosticDTO>)));
     connect(this, SIGNAL(CompletionSuggestionsReady(QStringList)), this->textEdit, SLOT(SetCompletionModel(QStringList)));
@@ -51,8 +54,10 @@ void CParser::Parse()
     CXUnsavedFile* unsavedFiles = new CXUnsavedFile[1];
     unsavedFiles[0] = unsavedFile;
 
-
+    QMutexLocker lock(&clangMutex);
     translationUnit = clang_parseTranslationUnit(index, fileName, args, numArgs, unsavedFiles, 1, CXTranslationUnit_DetailedPreprocessingRecord);
+    translationUnitHasBeenParsed = true;
+    lock.unlock();
 
     CXDiagnosticSet diagnosticSet = clang_getDiagnosticSetFromTU(translationUnit);
     unsigned int numDiags = clang_getNumDiagnosticsInSet(diagnosticSet);
@@ -157,7 +162,9 @@ void CParser::GenerateCompleterSuggestions()
     CXUnsavedFile* unsavedFiles = new CXUnsavedFile[1];
     unsavedFiles[0] = unsavedFile;
 
-    ClearCompletionList(); // clean the previous code completion list
+    QStringList completionList;
+
+    //ClearCompletionList(); // clean the previous code completion list
 
     QTextCursor cursor = textEdit->textCursor();
 
@@ -190,7 +197,12 @@ void CParser::GenerateCompleterSuggestions()
 
     if (line > 0 && col > 0)
     {
-        auto completions = clang_codeCompleteAt(translationUnit, fileName, line, col, unsavedFiles, 1, clang_defaultCodeCompleteOptions());
+        CXCodeCompleteResults* completions = NULL;
+
+        QMutexLocker lock(&clangMutex);
+        if (translationUnitHasBeenParsed)
+            completions = clang_codeCompleteAt(translationUnit, fileName, line, col, unsavedFiles, 1, clang_defaultCodeCompleteOptions());
+        lock.unlock();
 
         if (completions != NULL)
         {
@@ -207,20 +219,23 @@ void CParser::GenerateCompleterSuggestions()
                         auto chunkString = clang_getCompletionChunkText(completionString, j);
                         const char* completionItem = clang_getCString(chunkString);
 
-                        this->AddToCompletionList(completionItem);
+                        QString s(completionItem);
+                        s = s.trimmed();
+                        if (s != "")
+                            completionList.append(s);
+                        //this->AddToCompletionList(completionItem);
 
                         clang_disposeString(chunkString);
                     }
                 }
             }
 
-        clang_disposeCodeCompleteResults(completions);
+            clang_disposeCodeCompleteResults(completions);
         }
     }
 
-
     delete unsavedFiles;
-    emit CompletionSuggestionsReady(this->completionList);
+    emit CompletionSuggestionsReady(completionList);
 }
 
 void CParser::AddToCompletionList(const char *completionItem)
@@ -230,15 +245,20 @@ void CParser::AddToCompletionList(const char *completionItem)
     if (s == "")
         return;
 
-    this->completionList.append(s);
+    //this->completionList.append(s);
 }
 void CParser::ClearCompletionList()
 {
-    this->completionList.clear();
+ //   this->completionList.clear();
 }
 
 CParser::~CParser()
 {
+    disconnect(textEdit, SIGNAL(textChanged()), this, SLOT(ActivateTimer()));
+    disconnect(timer, SIGNAL(timeout()), this, SLOT(Parse()));
+    disconnect(this, SIGNAL(DiagnosticsReady(std::vector<DiagnosticDTO>)), this->textEdit, SLOT(ShowDiagnostics(std::vector<DiagnosticDTO>)));
+    disconnect(this, SIGNAL(CompletionSuggestionsReady(QStringList)), this->textEdit, SLOT(SetCompletionModel(QStringList)));
+
     clang_disposeTranslationUnit(translationUnit);
     clang_disposeIndex(index);
     delete timer;

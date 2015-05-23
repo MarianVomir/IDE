@@ -194,22 +194,20 @@ EditorPage* Editor::CreateTab(const QString& filePath)
     return page;
 }
 
-void Editor::CreateBlankTab()
+EditorPage* Editor::CreateBlankTab()
 {
     QString fileExtension = "";
     QString fileName = "(Unsaved)";
     QString fileContents = "";
 
     EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, &fileContents); // create default page with no text
-    if (page == NULL)
-        return;
 
     page->setProperty("filePath", QString(""));
     page->setProperty("fileName", fileName);
     page->setProperty("saved", false);
     page->setProperty("onDisk", false);
 
-    page->setPlainText(fileContents);
+    //page->setPlainText(fileContents);
 
     //connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
 
@@ -217,12 +215,16 @@ void Editor::CreateBlankTab()
 
     tabWidget->setTabText(index, page->property("fileName").toString() + "*");
     tabWidget->setCurrentIndex(index);
-    page->setFocus();
+
+    return page;
 }
 
 void Editor::NewFile()
 {
-    CreateBlankTab();
+    EditorPage* page = CreateBlankTab();
+    page->PerformAfterSetupOperations();
+    page->setFocus();
+
 }
 
 void Editor::OpenFile(const QString &filePath)
@@ -246,9 +248,10 @@ void Editor::OpenFile(const QString &filePath)
     tabWidget->setCurrentIndex(index);
 
     connect(page, SIGNAL(textChanged()), this, SLOT(CurrentDocChanged()));
-    page->setFocus();
-
     watcher->addPath(page->property("filePath").toString());
+
+    page->setFocus();
+    page->PerformAfterSetupOperations();
 }
 
 bool Editor::SaveFile()
@@ -320,6 +323,7 @@ bool Editor::SaveFileAs()
 
                 tabWidget->insertTab(tabWidget->indexOf(page), newPage, newPage->property("fileName").toString());
 
+                // disconnect here?
                 delete page;
 
                 page = newPage;

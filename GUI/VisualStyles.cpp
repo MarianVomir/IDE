@@ -4,8 +4,8 @@ VisualStyles::VisualStyles()
 {
     WindowStyle =
 
-          /*  "background-color: #222222;"
-            "color: #E6F096;"
+           // "background-color: #F0F0F0;"
+          /*  "color: #E6F096;"
             "border-color: #000000;"
             "selection-background-color: #AAAAAA;"*/
 

@@ -18,6 +18,8 @@ class CParser : QObject
 #define PARSING_INTERVAL 900 // milliseconds
 
 private:
+    QMutex clangMutex;
+    bool translationUnitHasBeenParsed;
 
 signals:
     void DiagnosticsReady(std::vector<DiagnosticDTO>);
@@ -36,7 +38,7 @@ protected:
     CXIndex index;
     QTimer* timer;
     CXTranslationUnit translationUnit;
-    QStringList completionList;
+   // QStringList completionList;
 
     void AddToCompletionList(const char* completionItem);
     void ClearCompletionList();

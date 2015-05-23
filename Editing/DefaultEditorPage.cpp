@@ -10,6 +10,11 @@ DefaultEditorPage::~DefaultEditorPage()
 {
 }
 
+void DefaultEditorPage::PerformAfterSetupOperations()
+{
+
+}
+
 void DefaultEditorPage::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Y && (e->modifiers() & (Qt::ControlModifier)))
