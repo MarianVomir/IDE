@@ -38,10 +38,6 @@ protected:
     CXIndex index;
     QTimer* timer;
     CXTranslationUnit translationUnit;
-   // QStringList completionList;
-
-    void AddToCompletionList(const char* completionItem);
-    void ClearCompletionList();
 
 protected slots:
     void ActivateTimer();

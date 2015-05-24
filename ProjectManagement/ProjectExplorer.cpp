@@ -54,12 +54,17 @@ void ProjectExplorer::AddPathsToWatcher(const QString& root)
 
 ProjectExplorer::~ProjectExplorer()
 {
-    this->projectTree->setModel(NULL);
+    if (this->projectTree)
+        this->projectTree->setModel(NULL);
+    if (projectModel)
+        delete projectModel;
 
-    delete projectModel;
-    delete rootRightClickMenu;
-    delete fileRightClickMenu;
-    delete folderRightClickMenu;
+    if (rootRightClickMenu)
+        delete rootRightClickMenu;
+    if (fileRightClickMenu)
+        delete fileRightClickMenu;
+    if (folderRightClickMenu)
+        delete folderRightClickMenu;
 }
 
 void ProjectExplorer::CloseActiveProject()

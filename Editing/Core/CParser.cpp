@@ -164,8 +164,6 @@ void CParser::GenerateCompleterSuggestions()
 
     QStringList completionList;
 
-    //ClearCompletionList(); // clean the previous code completion list
-
     QTextCursor cursor = textEdit->textCursor();
 
     static char structSeparators[] = ";[](){}~+-*\\/%#$^&|";
@@ -223,7 +221,6 @@ void CParser::GenerateCompleterSuggestions()
                         s = s.trimmed();
                         if (s != "")
                             completionList.append(s);
-                        //this->AddToCompletionList(completionItem);
 
                         clang_disposeString(chunkString);
                     }
@@ -238,20 +235,6 @@ void CParser::GenerateCompleterSuggestions()
     emit CompletionSuggestionsReady(completionList);
 }
 
-void CParser::AddToCompletionList(const char *completionItem)
-{
-    QString s(completionItem);
-    s = s.trimmed();
-    if (s == "")
-        return;
-
-    //this->completionList.append(s);
-}
-void CParser::ClearCompletionList()
-{
- //   this->completionList.clear();
-}
-
 CParser::~CParser()
 {
     disconnect(textEdit, SIGNAL(textChanged()), this, SLOT(ActivateTimer()));
@@ -259,7 +242,10 @@ CParser::~CParser()
     disconnect(this, SIGNAL(DiagnosticsReady(std::vector<DiagnosticDTO>)), this->textEdit, SLOT(ShowDiagnostics(std::vector<DiagnosticDTO>)));
     disconnect(this, SIGNAL(CompletionSuggestionsReady(QStringList)), this->textEdit, SLOT(SetCompletionModel(QStringList)));
 
-    clang_disposeTranslationUnit(translationUnit);
+    QMutexLocker lock(&clangMutex);
+    if (translationUnitHasBeenParsed)
+        clang_disposeTranslationUnit(translationUnit);
+    lock.unlock();
     clang_disposeIndex(index);
     delete timer;
 }

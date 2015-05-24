@@ -79,6 +79,9 @@
         <property name="text">
          <string>...</string>
         </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="0">
@@ -124,6 +127,9 @@
         <property name="text">
          <string>...</string>
         </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="2" column="0">
@@ -162,6 +168,9 @@
         </property>
         <property name="text">
          <string>...</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -500,6 +509,12 @@
    <property name="text">
     <string>OK</string>
    </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="btn_Cancel">
    <property name="geometry">
@@ -512,6 +527,9 @@
    </property>
    <property name="text">
     <string>Cancel</string>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

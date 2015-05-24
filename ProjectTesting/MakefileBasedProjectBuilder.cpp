@@ -111,15 +111,24 @@ QString MakefileBasedProjectBuilder::BuildMakefile(const Project& project)
     {
         ss << objectFileList[i].toStdString() << " : " << validSourceFileList[i].toStdString() << " ";
 
-/*
-        for (auto header : headerDependencies[validSourceFileList[i]])
+
+       /* for (auto header : headerDependencies[validSourceFileList[i]])
             ss << header.toStdString() << " ";
 */
 
         ss << "\n";
-        ss << "\t" << "$(compiler) -Wall -g" << " -c " << validSourceFileList[i].toStdString() << " -o " << objectFileList[i].toStdString() << " $(cFlags)\n";
+        string debugFlag = ""; // "-g" - when debugger is implemented
+        ss << "\t" << string("$(compiler) -Wall ") + debugFlag << " -c " << validSourceFileList[i].toStdString() << " -o " << objectFileList[i].toStdString() << " $(cFlags)\n";
     }
 
+ /*   for (auto headerList : headerDependencies.values())
+    {
+        for (auto header : headerList)
+        {
+            ss << header.toStdString() << " : " << "\n\t\n";
+        }
+    }
+*/
     ss << ".PHONY: clean rm all find" << "\n";
 
     ss << "clean:\n\tfind obj/ -name '*.o' -type f -delete";
