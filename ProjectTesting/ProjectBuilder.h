@@ -10,9 +10,6 @@ class ProjectBuilder : public QObject
 {
     Q_OBJECT
 
-protected:
-    OutputWriter* outputWriter;
-
 signals:
     void buildStarted();
     void buildFinished(int);
@@ -22,7 +19,7 @@ public:
     virtual int Clean(const Project& proj) = 0;
     virtual int Rebuild(const Project& proj) = 0;
 
-    ProjectBuilder(OutputWriter* outputWriter) : outputWriter(outputWriter) {}
+    ProjectBuilder();
     virtual ~ProjectBuilder() = 0;
 };
 

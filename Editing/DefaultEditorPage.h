@@ -13,7 +13,7 @@ class DefaultEditorPage : public EditorPage
 private:
 
 public:
-    DefaultEditorPage(const QString &contents);
+    DefaultEditorPage();
     virtual ~DefaultEditorPage();
 
     void PerformAfterSetupOperations();

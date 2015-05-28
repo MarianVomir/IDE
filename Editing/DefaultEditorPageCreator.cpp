@@ -10,9 +10,8 @@ DefaultEditorPageCreator::~DefaultEditorPageCreator()
 
 }
 
-EditorPage *DefaultEditorPageCreator::CreateEditorPage(void *args)
+EditorPage *DefaultEditorPageCreator::CreateEditorPage()
 {
-    QString* contents = static_cast<QString*>(args);
-    return new DefaultEditorPage(*contents);
+    return new DefaultEditorPage();
 }
 

@@ -1,6 +1,6 @@
 #include "CEditorPage.h"
 
-CEditorPage::CEditorPage(const QString& contents)
+CEditorPage::CEditorPage()
 {
     highlighter = new CSyntaxHighlighter(this->document());
     completer = new QCompleter(this);
@@ -28,9 +28,6 @@ CEditorPage::CEditorPage(const QString& contents)
     warningFormat.setUnderlineColor(QColor(255, 175, 50));
     warningFormat.setBackground(QBrush(QColor(240, 170, 0)));
 
-    this->setPlainText(contents);
-    undoStack.setUndoLimit(300);
-    undoStack.clear();
     connect(this->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(contentsChanged(int,int,int)));
 
     parser = new CParser(this);
@@ -48,6 +45,9 @@ void CEditorPage::PerformAfterSetupOperations()
 {
     if (this->parser != NULL)
         this->parser->Parse();
+
+    undoStack.setUndoLimit(500);
+    undoStack.clear();
 }
 
 void CEditorPage::DisplayTooltip(const QTextCursor& cursor, const QPoint& point)

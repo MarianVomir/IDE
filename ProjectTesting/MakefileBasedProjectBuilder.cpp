@@ -174,7 +174,7 @@ QStringList MakefileBasedProjectBuilder::GetUserIncludedHeaders(const QString &c
 }
 
 MakefileBasedProjectBuilder::MakefileBasedProjectBuilder(OutputWriter* outputWriter)
-    : ProjectBuilder(outputWriter)
+    : outputWriter(outputWriter)
 {
     process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);

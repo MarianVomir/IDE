@@ -178,16 +178,16 @@ EditorPage* Editor::CreateTab(const QString& filePath)
         fileContents = FileManager::ReadFile(filePath);
     }
 
-    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, &fileContents);
+    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension);
     if (page == NULL)
         return NULL;
-
-    //page->setPlainText(fileContents);
 
     page->setProperty("filePath", info.absoluteFilePath());
     page->setProperty("fileName", info.fileName());
     page->setProperty("saved", true);
     page->setProperty("onDisk", true);
+
+    page->setPlainText(fileContents);
 
     //connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
 
@@ -200,14 +200,14 @@ EditorPage* Editor::CreateBlankTab()
     QString fileName = "(Unsaved)";
     QString fileContents = "";
 
-    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension, &fileContents); // create default page with no text
+    EditorPage* page = EditorPageFactory::CreateEditorPage(fileExtension); // create default page with no text
 
     page->setProperty("filePath", QString(""));
     page->setProperty("fileName", fileName);
     page->setProperty("saved", false);
     page->setProperty("onDisk", false);
 
-    //page->setPlainText(fileContents);
+    page->setPlainText(fileContents);
 
     //connect(page->document(), SIGNAL(contentsChanged()), this, SLOT(CurrentDocChanged()));
 

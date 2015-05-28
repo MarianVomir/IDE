@@ -43,7 +43,7 @@ public slots:
     void SetCompletionModel(QStringList l);
 
 public:
-    CEditorPage(const QString& contents);
+    CEditorPage();
     ~CEditorPage();
     void PerformAfterSetupOperations();
 

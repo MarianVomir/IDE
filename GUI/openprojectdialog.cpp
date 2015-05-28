@@ -77,7 +77,7 @@ int OpenProjectDialog::exec()
             ui->txt_CompilerFlags->setText(project->CompilerFlags());
             ui->txt_LinkerFlags->setText(project->LinkerFlags());
         }
-        else // no .proj file was selected, therefore it makes no sense to display the dialog
+        else // no .proj file was selected
         {
             return QDialog::Rejected;
         }

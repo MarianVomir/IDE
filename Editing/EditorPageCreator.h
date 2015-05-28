@@ -8,7 +8,7 @@ class EditorPageCreator
 public:
     EditorPageCreator();
     virtual ~EditorPageCreator() = 0;
-    virtual EditorPage* CreateEditorPage(void* args) = 0;
+    virtual EditorPage* CreateEditorPage() = 0;
 };
 
 

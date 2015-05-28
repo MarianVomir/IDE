@@ -18,7 +18,7 @@ private:
     ~EditorPageFactory();
 
 public:
-    static EditorPage* CreateEditorPage(const QString& fileExtension, void* args);
+    static EditorPage* CreateEditorPage(const QString& fileExtension);
     static QMap<QString, EditorPageCreator*>& Creators() { return creators; }
 };
 

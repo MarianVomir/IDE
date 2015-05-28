@@ -1,9 +1,7 @@
 #include "DefaultEditorPage.h"
 
-DefaultEditorPage::DefaultEditorPage(const QString& contents)
+DefaultEditorPage::DefaultEditorPage()
 {
-    this->setPlainText(contents);
-    this->document()->clearUndoRedoStacks();
 }
 
 DefaultEditorPage::~DefaultEditorPage()
@@ -12,7 +10,7 @@ DefaultEditorPage::~DefaultEditorPage()
 
 void DefaultEditorPage::PerformAfterSetupOperations()
 {
-
+    this->document()->clearUndoRedoStacks();
 }
 
 void DefaultEditorPage::keyPressEvent(QKeyEvent *e)

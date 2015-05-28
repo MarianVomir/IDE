@@ -17,6 +17,7 @@ class MakefileBasedProjectBuilder : public ProjectBuilder
 
 private:
     QProcess* process;
+    OutputWriter* outputWriter;
 
 public:
     MakefileBasedProjectBuilder(OutputWriter* outputWriter);

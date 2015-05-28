@@ -10,9 +10,8 @@ CEditorPageCreator::~CEditorPageCreator()
 
 }
 
-EditorPage* CEditorPageCreator::CreateEditorPage(void* args)
+EditorPage* CEditorPageCreator::CreateEditorPage()
 {
-    QString* contents = static_cast<QString*>(args);
-    return new CEditorPage(*contents);
+    return new CEditorPage();
 }
 

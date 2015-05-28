@@ -13,9 +13,10 @@ int main(int argc, char *argv[])
 {
     // Add supported file extensions
 
+    auto cPageCreator = new CEditorPageCreator();
     EditorPageFactory::Creators().insert("", new DefaultEditorPageCreator()); // default (plain text)
-    EditorPageFactory::Creators().insert("c", new CEditorPageCreator()); // C language (.c's)
-    EditorPageFactory::Creators().insert("h", new CEditorPageCreator()); // C headers (same as .c's)
+    EditorPageFactory::Creators().insert("c", cPageCreator); // C language (.c's)
+    EditorPageFactory::Creators().insert("h", cPageCreator); // C headers (same as .c's)
 
     try
     {
