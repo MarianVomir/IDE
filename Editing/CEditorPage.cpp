@@ -46,8 +46,8 @@ void CEditorPage::PerformAfterSetupOperations()
     if (this->parser != NULL)
         this->parser->Parse();
 
-    undoStack.setUndoLimit(500);
     undoStack.clear();
+    undoStack.setUndoLimit(500);
 }
 
 void CEditorPage::DisplayTooltip(const QTextCursor& cursor, const QPoint& point)
