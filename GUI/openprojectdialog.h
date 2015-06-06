@@ -38,8 +38,6 @@ private:
     ProjectFileConverter* converter;
     Project* project;
     QString projFilePath;
-    QFileDialog* fileDialog;
-
 };
 
 #endif // OPENPROJECTDIALOG_H

@@ -71,9 +71,9 @@ void CParser::Parse()
         int numRanges = clang_getDiagnosticNumRanges(diag);
         if (numRanges > 0)
         {
-            for (int j = 0; j < numRanges; j++)
+           // for (int j = 0; j < numRanges; j++)
             {
-                CXSourceRange range = clang_getDiagnosticRange(diag, j);
+                CXSourceRange range = clang_getDiagnosticRange(diag, 0);//j);
                 CXSourceLocation startLoc = clang_getRangeStart(range);
                 CXSourceLocation endLoc = clang_getRangeEnd(range);
                 unsigned int offset1;

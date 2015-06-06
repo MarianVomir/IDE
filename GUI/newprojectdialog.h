@@ -26,8 +26,6 @@ private:
     QCompleter* completer;
     QDirModel* model;
 
-    QFileDialog* fileDialog;
-
 public slots:
     void OnPathChanged(QString s);
     void OnBrowseContainingFolderClicked();

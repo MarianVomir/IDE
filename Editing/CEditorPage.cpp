@@ -215,7 +215,7 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
         {
             if (undoStack.canUndo())
                 undoStack.undo();
-            /*else
+           /* else
                 this->document()->setModified(false);*/
             return;
         }
@@ -230,7 +230,7 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
 
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space); // CTRL+Space
     if (!completer || !isShortcut)
-        QPlainTextEdit::keyPressEvent(e);
+        EditorPage::keyPressEvent(e);
 
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     if (!completer || (ctrlOrShift && e->text().isEmpty()))
@@ -250,6 +250,7 @@ void CEditorPage::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backspace || hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1) /*!isShortcut && (eow.contains(e->text().right(1)) ||*/
     {
         completer->popup()->hide();
+        //EditorPage::keyPressEvent(e);
         return;
     }
 

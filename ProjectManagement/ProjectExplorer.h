@@ -48,7 +48,6 @@ private slots:
     void OnProjectDeleteFolderClicked();
     void OnRenameClicked();
     QModelIndex GetTreeSelectedIndex();
-    void AddPathsToWatcher(const QString& root);
 
 public:
     ProjectExplorer();

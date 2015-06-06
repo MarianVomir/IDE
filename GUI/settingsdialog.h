@@ -45,8 +45,6 @@ private:
     QCompleter* completer;
     QDirModel* model;
 
-    QFileDialog* fileDialog;
-
     void Load();
     void Save();
 };

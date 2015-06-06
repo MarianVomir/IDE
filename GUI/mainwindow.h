@@ -96,8 +96,6 @@ private:
     OutputWriter* outputWriter;
     ProjectRunner* projectRunner;
 
-    QFileDialog* fileDialog;
-
 public:
     void OnNewProject();
     void OnOpenProject();

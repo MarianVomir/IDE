@@ -6,7 +6,6 @@ NewProjectDialog::NewProjectDialog(QWidget* parent) :
     ui(new Ui::NewProjectDialog)
 {
     ui->setupUi(this);
-    fileDialog = new QFileDialog(this);
 
     connect(ui->txt_ProjectName, SIGNAL(textChanged(QString)), this, SLOT(OnPathChanged(QString)));
     connect(ui->txt_ContainingFolder, SIGNAL(textChanged(QString)), this, SLOT(OnPathChanged(QString)));
@@ -36,7 +35,6 @@ NewProjectDialog::NewProjectDialog(QWidget* parent) :
 }
 NewProjectDialog::~NewProjectDialog()
 {
-    delete fileDialog;
     delete ui;
 }
 
@@ -80,7 +78,7 @@ void NewProjectDialog::OnPathChanged(QString s)
 }
 void NewProjectDialog::OnBrowseContainingFolderClicked()
 {
-    QString folderName = fileDialog->getExistingDirectory(this, "Browse File", ui->txt_ContainingFolder->text().trimmed());
+    QString folderName = QFileDialog::getExistingDirectory(this, "Browse File", ui->txt_ContainingFolder->text().trimmed());
 
     if (folderName.size() != 0)
     {
@@ -89,7 +87,7 @@ void NewProjectDialog::OnBrowseContainingFolderClicked()
 }
 void NewProjectDialog::OnBrowseCompilerClicked()
 {
-    QString compiler = fileDialog->getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
+    QString compiler = QFileDialog::getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
 
     if (compiler.size() != 0)
     {
@@ -98,7 +96,7 @@ void NewProjectDialog::OnBrowseCompilerClicked()
 }
 void NewProjectDialog::OnBrowseDebuggerClicked()
 {
-    QString debugger = fileDialog->getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
+    QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
     if (debugger.size() != 0)
     {
         ui->txt_Debugger->setText(debugger);
@@ -106,7 +104,7 @@ void NewProjectDialog::OnBrowseDebuggerClicked()
 }
 void NewProjectDialog::OnBrowseMakeClicked()
 {
-    QString make = fileDialog->getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
+    QString make = QFileDialog::getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
 
     if (make.size() != 0)
     {

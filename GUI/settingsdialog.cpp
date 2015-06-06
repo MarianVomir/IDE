@@ -6,7 +6,6 @@ SettingsDialog::SettingsDialog(ProjectExplorer* projectExplorer, QWidget *parent
     ui(new Ui::SettingsDialog), projectExplorer(projectExplorer)
 {
     ui->setupUi(this);
-    fileDialog = new QFileDialog(this);
 
     connect(ui->btn_BrowseDebugger, SIGNAL(clicked()), this, SLOT(OnBrowseDebuggerClicked()));
     connect(ui->btn_BrowseCompiler, SIGNAL(clicked()), this, SLOT(OnBrowseCompilerClicked()));
@@ -108,7 +107,6 @@ void SettingsDialog::Save()
 
 SettingsDialog::~SettingsDialog()
 {
-    delete fileDialog;
     delete ui;
 }
 
@@ -132,7 +130,7 @@ void SettingsDialog::on_btn_Cancel_clicked()
 
 void SettingsDialog::OnBrowseCompilerClicked()
 {
-    QString compiler = fileDialog->getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
+    QString compiler = QFileDialog::getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
 
     if (compiler.size() != 0)
     {
@@ -141,7 +139,7 @@ void SettingsDialog::OnBrowseCompilerClicked()
 }
 void SettingsDialog::OnBrowseDebuggerClicked()
 {
-    QString debugger = fileDialog->getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
+    QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
     if (debugger.size() != 0)
     {
         ui->txt_Debugger->setText(debugger);
@@ -149,7 +147,7 @@ void SettingsDialog::OnBrowseDebuggerClicked()
 }
 void SettingsDialog::OnBrowseMakeClicked()
 {
-    QString make = fileDialog->getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
+    QString make = QFileDialog::getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
 
     if (make.size() != 0)
     {
@@ -159,7 +157,7 @@ void SettingsDialog::OnBrowseMakeClicked()
 
 void SettingsDialog::OnBrowseCompilerDefaultClicked()
 {
-    QString compiler = fileDialog->getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
+    QString compiler = QFileDialog::getOpenFileName(this, "Browse Compiler Executable", ui->txt_Compiler->text().trimmed());
 
     if (compiler.size() != 0)
     {
@@ -168,7 +166,7 @@ void SettingsDialog::OnBrowseCompilerDefaultClicked()
 }
 void SettingsDialog::OnBrowseDebuggerDefaultClicked()
 {
-    QString debugger = fileDialog->getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
+    QString debugger = QFileDialog::getOpenFileName(this, "Browse Debugger Executable", ui->txt_Debugger->text().trimmed());
     if (debugger.size() != 0)
     {
         ui->txt_Debugger_Default->setText(debugger);
@@ -176,7 +174,7 @@ void SettingsDialog::OnBrowseDebuggerDefaultClicked()
 }
 void SettingsDialog::OnBrowseMakeDefaultClicked()
 {
-    QString make = fileDialog->getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
+    QString make = QFileDialog::getOpenFileName(this, "Browse Make Executable", ui->txt_Make->text().trimmed());
 
     if (make.size() != 0)
     {

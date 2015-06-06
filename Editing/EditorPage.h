@@ -31,6 +31,9 @@ public:
 protected:
     void resizeEvent(QResizeEvent *);
 
+public slots:
+   // void keyPressEvent(QKeyEvent* e);
+
 private slots:
     void updateLineNumberAreaWidth(int);
     void highlightCurrentLine();

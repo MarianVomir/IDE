@@ -19,7 +19,6 @@ class Editor : QWidget
 private:
     QTabWidget* tabWidget;
     QFileSystemWatcher* watcher;
-    QFileDialog* fileDialog;
 
     QString GetFileExtension(const QString &filePath);
 

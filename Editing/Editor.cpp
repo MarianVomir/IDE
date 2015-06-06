@@ -3,9 +3,6 @@
 Editor::Editor(QTabWidget *tabWidget)
     : tabWidget(tabWidget)
 {
-    fileDialog = new QFileDialog(this);
-    fileDialog->setStyleSheet(Global::Visual.WindowStyle);
-
     while (tabWidget->count()) delete tabWidget->widget(0);
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
 
@@ -24,7 +21,6 @@ Editor::~Editor()
     disconnect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseTab(int)));
 
     delete watcher;
-    delete fileDialog;
 }
 
 bool Editor::AskSaveAll()
@@ -304,7 +300,7 @@ bool Editor::SaveFileAs()
     if (page == NULL)
         return false;
 
-    QString file = fileDialog->getSaveFileName(this, "Save File As...", QDir::homePath(), "", 0, QFileDialog::DontUseNativeDialog);
+    QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath(), "", 0, QFileDialog::DontUseNativeDialog);
 
     if (file != "")
     {
@@ -416,7 +412,7 @@ void Editor::CloseTab(int index)
         int answer = box.exec();
         if (answer == QMessageBox::Save)
         {
-            QString file = fileDialog->getSaveFileName(this, "Save File As...", QDir::homePath());
+            QString file = QFileDialog::getSaveFileName(this, "Save File As...", QDir::homePath());
             if (file != "")
             {
                 try

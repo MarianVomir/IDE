@@ -25,31 +25,6 @@ ProjectExplorer::ProjectExplorer()
     folderRightClickMenu->addAction("New Subfolder", this, SLOT(OnProjectNewSubfolderClicked()));
     folderRightClickMenu->addAction("Rename", this, SLOT(OnRenameClicked()));
     folderRightClickMenu->addAction("Delete Folder", this, SLOT(OnProjectDeleteFolderClicked()));
-
-}
-
-void ProjectExplorer::AddPathsToWatcher(const QString& root)
-{/*
-    if (projectModel != NULL)
-        projectModel->refresh();
-
-    if (watcher == NULL)
-        return;
-
-    QFileInfo info(root);
-
-    if (info.isFile() || !info.exists())
-        return;
-    else
-    {
-
-        for (QString& entry : FileManager::GetFolderContents(root))
-        {
-            if (QFileInfo(entry).isDir())
-                watcher->addPath(entry);
-        }
-
-    }*/
 }
 
 ProjectExplorer::~ProjectExplorer()
@@ -108,11 +83,6 @@ void ProjectExplorer::SetActiveProject(Project *project)
 
     this->activeProject = project;
 
-    /*
-    watcher = new QFileSystemWatcher();
-    connect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(AddPathsToWatcher(QString)));
-    AddPathsToWatcher(this->activeProject->Root() + "src/");
-    */
 
     this->projectModel = new ProjectDirModel(NULL, project->Name());
     this->projectModel->setReadOnly(false);
@@ -139,8 +109,6 @@ void ProjectExplorer::SetTree(QTreeView* tree)
 
     if (this->projectTree != NULL)
     {
-        //this->projectTree->setDragDropMode(QAbstractItemView::NoDragDrop);
-      //  this->projectTree->setEditTriggers(QTreeView::NoEditTriggers);
         this->projectTree->setEditTriggers(QTreeView::AnyKeyPressed);
         connect(this->projectTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(OnProjectTreeRightClick(QPoint)));
     }
@@ -203,10 +171,7 @@ void ProjectExplorer::OnProjectNewFileClicked()
 
         this->CreateFile(info.filePath() + "/" + newFileBaseName);
         projectModel->refresh();
-        //projectTree->expand(index);
     }
-
-    //projectTree->expand(index);
 }
 
 void ProjectExplorer::OnProjectNewSubfolderClicked()
@@ -222,10 +187,6 @@ void ProjectExplorer::OnProjectNewSubfolderClicked()
         }
 
        projectModel->refresh();
-       /* if (!projectTree->isExpanded(index))*/
-      // projectTree->expand(index);
-
-
     }
 }
 

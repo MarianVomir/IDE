@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    fileDialog = new QFileDialog(this);
 
     statusBar()->hide();
     ui->mainToolBar->hide();
@@ -54,7 +53,6 @@ MainWindow::~MainWindow()
     delete projectExplorer;
     delete converter;
     delete projectBuilder;
-    delete fileDialog;
 
     delete ui;
 }
@@ -148,7 +146,7 @@ void MainWindow::on_actionRefreshProjectExplorer_triggered()
 }
 void MainWindow::on_actionOpen_File_triggered()
 {
-    QStringList files = fileDialog->getOpenFileNames(this, "Open File(s)", QDir::homePath());
+    QStringList files = QFileDialog::getOpenFileNames(this, "Open File(s)", QDir::homePath());
     for (int i = 0; i < files.size(); i++)
     {
         try

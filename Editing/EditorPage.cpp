@@ -76,6 +76,64 @@ void EditorPage::resizeEvent(QResizeEvent* e)
     QRect cr = contentsRect();
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
+/*
+void EditorPage::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Tab)
+    {
+        QTextCursor cursor = this->textCursor();
+
+        int start = cursor.anchor();
+        int end = cursor.position();
+
+        if (start > end)
+            qSwap(start, end);
+
+        cursor.setPosition(start, QTextCursor::MoveAnchor);
+        int startBlock = cursor.blockNumber();;
+
+        cursor.setPosition(end, QTextCursor::MoveAnchor);
+        int endBlock = cursor.blockNumber();
+
+        cursor.setPosition(start, QTextCursor::MoveAnchor);
+
+        cursor.beginEditBlock();
+        for (int i = 0; i <= (endBlock - startBlock); ++i)
+        {
+            cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+            cursor.insertText("\t");
+            cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);
+        }
+        cursor.endEditBlock();
+
+        cursor.setPosition(start, QTextCursor::MoveAnchor);
+        if (startBlock != endBlock)
+        {
+            cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+
+
+            while(cursor.blockNumber() < endBlock)
+            {
+                cursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
+            }
+
+            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        }
+        setTextCursor(cursor);
+
+        if (e->modifiers() & Qt::ShiftModifier) // Shift-Tab
+        {
+
+        }
+        else // Tab
+        {
+
+        }
+
+    }
+    else
+        QPlainTextEdit::keyPressEvent(e);
+}*/
 void EditorPage::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
