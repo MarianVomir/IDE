@@ -131,7 +131,7 @@ void NewProjectDialog::OnOkButtonClicked()
         QMessageBox::StandardButton answer = QMessageBox::question(
                     NULL,
                     "Compiler or make not present",
-                    "If you do not specify a compiler and a make utility, you will not be able to build the project. Create project anyway?",
+                    "If you do not specify a compiler and a make tool, you will not be able to build the project. Create project anyway?",
                     QMessageBox::Yes | QMessageBox::No
                 );
         if (answer == QMessageBox::No)

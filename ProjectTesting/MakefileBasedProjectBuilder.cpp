@@ -218,6 +218,12 @@ int MakefileBasedProjectBuilder::Build(const Project& proj)
 {
     emit buildStarted();
 
+    if (proj.Compiler() == "" || proj.MakeUtility() == "")
+    {
+        emit buildFinished(-1);
+        return -1;
+    }
+
     QStringList sourceFiles;
     QStringList sourceDirs;
     QString projectRoot = proj.Root();
@@ -275,6 +281,9 @@ int MakefileBasedProjectBuilder::Build(const Project& proj)
 }
 int MakefileBasedProjectBuilder::Clean(const Project& proj)
 {
+    if (proj.MakeUtility() == "")
+        return -1;
+
     process->setWorkingDirectory(proj.Root());
     process->start(proj.MakeUtility() + " -f " + proj.Name() + ".makefile " + " clean "); // make target "clean"
 

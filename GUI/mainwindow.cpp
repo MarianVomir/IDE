@@ -176,6 +176,11 @@ void MainWindow::on_actionBuild_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        if (project->MakeUtility() == "" || project->Compiler() == "")
+        {
+            QMessageBox::warning(this, "Cannot build", "Make tool and compiler must be specified to build project!");
+            return;
+        }
         this->projectExplorer->Refresh();
 
         outputWriter->Clear();
@@ -187,6 +192,11 @@ void MainWindow::on_actionClean_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        if (project->MakeUtility() == "")
+        {
+            QMessageBox::warning(this, "Cannot build", "Make tool must be specified to clean project!");
+            return;
+        }
         this->projectExplorer->Refresh();
 
         outputWriter->Clear();
@@ -198,6 +208,11 @@ void MainWindow::on_actionRebuild_triggered()
     const Project* project = projectExplorer->GetProject();
     if (project != NULL)
     {
+        if (project->MakeUtility() == "" || project->Compiler() == "")
+        {
+            QMessageBox::warning(this, "Cannot build", "Make tool and compiler must be specified to rebuild project!");
+            return;
+        }
         this->projectExplorer->Refresh();
 
         outputWriter->Clear();
