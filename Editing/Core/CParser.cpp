@@ -27,7 +27,9 @@ void CParser::ActivateTimer()
 void CParser::Parse()
 {
     static const char* args[] = {
-                                  "-c", "-x", "c",
+                                  "-c",
+                                  "-x",
+                                  "c",
                                   "-Wall",
                                   "-Wunreachable-code",
                                   "-Wconversion",
@@ -40,9 +42,13 @@ void CParser::Parse()
                                   "-Wformat-invalid-specifier",
                                   "-Wformat-zero-length",
                                   "-Wheader-guard",
-                                  "-Wnewline-eof"
+                                  "-Wnewline-eof",
+                                  "-Wshadow",
+                                  "-Wunused-parameter",
+                                  "-Wnull-dereference",
+                                  "-Wdiscard-qual"
                                 };
-    static int numArgs = 16;
+    static int numArgs = 20;
 
     QByteArray b = textEdit->toPlainText().toLocal8Bit();
     unsigned int len = b.length();
